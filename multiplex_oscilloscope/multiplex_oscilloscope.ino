@@ -54,7 +54,7 @@ int getValue( int channel) {
     digitalWrite(pin, isBitSet);
 
   }
-  return analogRead(analogPin);
+  return analogRead(analogInput);
 }
 
 void contactProcessing() {
