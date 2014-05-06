@@ -25,23 +25,20 @@ void loop () {
 
     analog2 = getValue(2); // Read the Common Output from HEF4051
     
-    
+    /* // for arduino-only debugging
     Serial.print(analog1); // Print out the Value
     Serial.print("    |    ");
     Serial.print(analog2);
     Serial.println();
+    */
 
-/*  
   if (Serial.available() > 0){
-    
     Serial.write(analog1);
+    delay(5);
     Serial.write(analog2);
-    
+    delay(5);
   }
-  
-  */
-
-  delay (10);
+ 
 }
 
 
@@ -60,6 +57,6 @@ int getValue( int channel) {
 void contactProcessing() {
   while(Serial.available() <= 0){
     Serial.print('A');
-    delay(30);
+    delay(10);
   }
 }
