@@ -3,6 +3,7 @@
 
 int analogIn = 0; // Analog Value to read
 String multiName = "";
+int digitalPin = 0; // digital pin to switch high or low
 
 int multiplexers [numMultiplexers][numChannels];
 
@@ -62,10 +63,22 @@ int getValue( int multiplexer, int channel) {
 
   for(int bit = 0; bit < 3; bit++){
 
-    int pin = multiName[bit]; // the pin wired to the multiplexer select bit
-//    int pin = multi_0[bit];
+    // there's something wrong here, maybe because multi_0 isn't actually reading as a String, but rather some other kind of array name...?
+    //int pin = multiName[bit]; // the pin wired to the multiplexer select bit
+
+    switch (multiplexer) {
+    case 0:
+      digitalPin = multi_0[bit];
+      break;
+    case 1:
+      digitalPin = multi_1[bit];       
+      break;
+    default:
+      break;
+    }
+    //    int pin = multi_0[bit];
     int isBitSet = bitRead(channel, bit); // true if given bit set in channel
-    digitalWrite(pin, isBitSet);
+    digitalWrite(digitalPin, isBitSet);
 
   }
   return analogRead(multiplexer);
@@ -77,4 +90,5 @@ void contactProcessing() {
     delay(10);
   }
 }
+
 
