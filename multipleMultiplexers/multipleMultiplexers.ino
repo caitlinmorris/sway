@@ -14,12 +14,6 @@ void setup() {
   
   Serial.begin(9600); // Setup Serial Port
   
-  for (int i = 0; i < numMultiplexers; i++){
-    for (int j = 0; j < numChannels; j++){
-      multiplexers[i][j] = i*j;
-    }
-  }
-  
   for(int bit = 0; bit < 3; bit++){
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
     pinMode(multi_1[bit], OUTPUT);
