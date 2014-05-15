@@ -1,16 +1,16 @@
-#define numMultiplexers 1
+#define numMultiplexers 2
 #define numChannels 4
 
 int analogIn = 0; // Analog Value to read
-String multiName = "";
 int digitalPin = 0; // digital pin to switch high or low
+int analogOut = A0; // analog output pin; will change in getValue switch case
 
 int multiplexers [numMultiplexers][numChannels];
 
 const int multi_0[] = {
   8,9,10}; // array of the pins connected to the 4051 input
 const int multi_1[] = {
-  0,1,2};
+  2,3,4};
 
 int inByte = 0;
 
@@ -29,8 +29,6 @@ void setup() {
 
 void loop () {
 
-  //    analog1 = getValue(0,0);
-
   for(int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
       analogIn = getValue(i,j);
@@ -42,7 +40,7 @@ void loop () {
       Serial.print("   |   ");
       delay(10);
     }
-    Serial.println(multiName);
+    Serial.println();
   }    
   /*
 
@@ -59,7 +57,6 @@ void loop () {
 
 int getValue( int multiplexer, int channel) {
   // set the selector pins HIGH and LOW to match the binary value of channel
-  multiName = String("multi_" + (String)multiplexer);
 
   for(int bit = 0; bit < 3; bit++){
 
@@ -69,19 +66,21 @@ int getValue( int multiplexer, int channel) {
     switch (multiplexer) {
     case 0:
       digitalPin = multi_0[bit];
+      analogOut = A0;
       break;
     case 1:
-      digitalPin = multi_1[bit];       
+      digitalPin = multi_1[bit];
+      analogOut = A1;      
       break;
     default:
       break;
     }
-    //    int pin = multi_0[bit];
+    
     int isBitSet = bitRead(channel, bit); // true if given bit set in channel
     digitalWrite(digitalPin, isBitSet);
 
   }
-  return analogRead(multiplexer);
+  return analogRead(analogOut);
 }
 
 void contactProcessing() {
