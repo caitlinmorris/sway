@@ -3,8 +3,8 @@
 
 #include <XBee.h>
 
-#define numMultiplexers 2
-#define numChannels 8
+#define numMultiplexers 1
+#define numChannels 2
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -14,12 +14,12 @@ XBee xbee = XBee();
 
 int multiplexers [numMultiplexers][numChannels];
 //uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // numChannels + 1 (usually 9 total)
-uint8_t payload[] = { 0, 0 }; // smaller payload for testing
+uint8_t payload[] = { 0, 0, 0 }; // smaller payload for testing
 
 const int multi_0[] = {
-  11,12,13}; // array of the pins connected to the 4051 input
+  9,10,11}; // array of the pins connected to the 4051 input
 const int multi_1[] = {
-  8,9,10};
+  6,7,8};
   
 // SH + SL Address of receiving XBee
 XBeeAddress64 addr64 = XBeeAddress64(0x0013a200, 0x40a2684e);
@@ -53,7 +53,7 @@ void loop () {
   
   // currently leaving out response packet steps!
   
-  delay(50);
+  delay(100);
 }
 
 
