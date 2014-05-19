@@ -1,17 +1,18 @@
 #define numMultiplexers 2
-#define numChannels 4
+#define numChannels 8
 
-int analogIn = 0; // Analog Value to read
+int analogIn = 0; // stores analog value
+
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
 int multiplexers [numMultiplexers][numChannels];
 
 const int multi_0[] = {
-  8,9,10}; // array of the pins connected to the 4051 input
+  11,12,13}; // array of the pins connected to the 4051 input
 const int multi_1[] = {
-  2,3,4};
-
+  8,9,10};
+  
 int inByte = 0;
 
 void setup() {
@@ -22,8 +23,8 @@ void setup() {
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
     pinMode(multi_1[bit], OUTPUT);
   }
-
-  // contactProcessing();
+  
+//   contactProcessing();
 
 }
 
@@ -32,39 +33,30 @@ void loop () {
   for(int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
       analogIn = getValue(i,j);
-      Serial.print(i);
-      Serial.print(" : ");
-      Serial.print(j);
-      Serial.print(" : ");
-      Serial.print(analogIn);
-      Serial.print("   |   ");
-      delay(10);
+       Serial.print(i);
+       Serial.print(" : ");
+       Serial.print(j);
+       Serial.print(" : ");
+       Serial.print(analogIn);
+       Serial.print("   |   ");
+       
     }
-    Serial.println();
   }    
-  /*
-
-   if (Serial.available() > 0){
-   Serial.write(analog1);
-   delay(5);
-   Serial.write(analog2);
-   delay(5);
-   }
-   */
-
+  
+  delay(5);
 }
 
 
 int getValue( int multiplexer, int channel) {
   // set the selector pins HIGH and LOW to match the binary value of channel
 
-  for(int bit = 0; bit < 3; bit++){
+    for(int bit = 0; bit < 3; bit++){
 
-    // there's something wrong here, maybe because multi_0 isn't actually reading as a String, but rather some other kind of array name...?
+    // there's something wrong here, maybe because multi_0 isn't actually reading as a String, but rather some other kind of array name..
     //int pin = multiName[bit]; // the pin wired to the multiplexer select bit
 
     switch (multiplexer) {
-    case 0:
+      case 0:
       digitalPin = multi_0[bit];
       analogOut = A0;
       break;
@@ -75,7 +67,7 @@ int getValue( int multiplexer, int channel) {
     default:
       break;
     }
-    
+
     int isBitSet = bitRead(channel, bit); // true if given bit set in channel
     digitalWrite(digitalPin, isBitSet);
 
@@ -89,5 +81,6 @@ void contactProcessing() {
     delay(10);
   }
 }
+
 
 

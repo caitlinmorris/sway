@@ -1,11 +1,12 @@
 import processing.serial.*;
 
 Serial myPort;                       // The serial port
-int[] serialInArray = new int[2];    // Where we'll put what we receive
+int[] serialInArray = new int[8];    // Where we'll put what we receive
 //int serialIn = 0;
 int serialCount = 0;                 // A count of how many bytes we receive
 boolean firstContact = false;         // Whether we've heard from the microcontroller
-int ell1, ell2;                        // Size of the squares
+int val01, val02, val03, val04;       // Size of the squares
+int val05, val06, val07, val08;
 
 void setup() {
   size(800, 500);
@@ -23,8 +24,8 @@ void draw() {
     background(0);
     
     color(255);
-    ellipse(width/4, height/2, ell1, ell1);
-    ellipse((3*width)/4, height/2, ell2, ell2);
+    textSize(20);
+    text(val01, width/5, height/3);
 
 }
 
@@ -49,14 +50,29 @@ void serialEvent(Serial myPort) {
     serialCount++;
 
     // If we have 2 bytes:
-    if (serialCount > 1 ) {
-      ell1 = serialInArray[0];
-      ell2 = serialInArray[1];
+    if (serialCount > 7 ) {
+      val01 = serialInArray[0];
+      val02 = serialInArray[1];
+      val03 = serialInArray[2];
+      val04 = serialInArray[3];
+      val05 = serialInArray[4];
+      val06 = serialInArray[5];
+      val07 = serialInArray[6];
+      val08 = serialInArray[7];
       
-      print(ell1);
-      print("   |   ");
-      print(ell2);
+      print(val01);
+      print("  |  ");
+      print(val02);
+      print("  |  ");
+      print(val03);
+      print("  |  ");
+      print(val04);
       println();
+      
+//      print(ell1);
+//      print("   |   ");
+//      print(ell2);
+//      println();
 
       // Send a capital A to request new sensor readings:
       myPort.write('A');

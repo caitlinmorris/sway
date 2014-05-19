@@ -8,7 +8,7 @@
 int analog1 = 0; // Analog Value to read
 int analog2 = 0;
 
-const int select[] = {2,3,4}; // array of the pins connected to the 4051 input
+const int select[] = {11,12,13}; // array of the pins connected to the 4051 input
 
 void setup()
 {
@@ -26,7 +26,7 @@ void loop()
 
   analog1 = getValue(0);
 
-  analog2 = getValue(2); // Read the Common Output from HEF4051
+  analog2 = getValue(1); // Read the Common Output from HEF4051
   
   
   Serial.print(analog1); // Print out the Value
