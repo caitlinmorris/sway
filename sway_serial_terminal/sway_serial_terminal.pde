@@ -26,6 +26,8 @@ int packetByteCount = 0;
 int packetByteLength = 21;
 int startByte = 126;
 
+String printVals = "";
+
 void setup() { 
   size(200, 200);
   PFont myFont = createFont(PFont.list()[2], 14); 
@@ -64,12 +66,20 @@ void serialEvent(Serial myPort) {
    println(xbeeByte);*/
 
   if (inByte == startByte) {
+    println(printVals);
+    printVals = "";
     packetByteCount = 0;
     packetCaseNum++;
     packetCaseNum %= packetBufferSize;
   }
   else {
     packetByteCount++;
+    if(packetByteCount == 17 || packetByteCount == 18){
+      printVals += packetByteCount;
+      printVals += ": ";
+      printVals += inByte;
+      printVals += "   ";
+    }
   }
   println("inByte = "+ inByte);
   println("packetByteCount = "+packetByteCount);
