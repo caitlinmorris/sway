@@ -1,7 +1,7 @@
 /*
 Basic XBee Serial Terminal 
-based on a sketch from:
-Making Things Talk
+ based on a sketch from:
+ Making Things Talk
  */
 
 import processing.serial.*;
@@ -20,8 +20,7 @@ void setup() {
   size(200, 200);
   println(Serial.list());
   portNum = Serial.list()[7];
-
-  myPort = new Serial(this, portNum, 9600);
+  myPort = new Serial(this, portNum, 9600);  
 }
 
 void draw() {
@@ -41,6 +40,10 @@ void serialEvent(Serial myPort) {
     }
 
     inPacket[0] = inByte;
+    printVals += packetIndex;
+    printVals += ": ";
+    printVals += inByte;
+    printVals += "   ";
     packetIndex++;
   }
 
@@ -48,7 +51,8 @@ void serialEvent(Serial myPort) {
     inPacket[packetIndex] = inByte;
     packetIndex++;
 
-    if (packetByteCount == 17 || packetByteCount == 18) {
+    if (packetIndex > 17) {
+      //    if (packetIndex == 17 || packetIndex == 18) {
       printVals += packetIndex;
       printVals += ": ";
       printVals += inByte;
