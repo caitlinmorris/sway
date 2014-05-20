@@ -16,14 +16,20 @@ String printVals = "";
 
 int [] inPacket = new int [packetByteLength]; // should be the size of whatever the expected packet is
 
+int sensorValue= 100; 
+int sensorValue2= 100;
+
 void setup() {
-  size(200, 200);
+  size(600, 200);
   println(Serial.list());
   portNum = Serial.list()[7];
   myPort = new Serial(this, portNum, 9600);  
 }
 
 void draw() {
+  background(0);
+    rect(0,0,sensorValue*2, 100);
+      rect(0,100,sensorValue2*2, 100);
 }
 
 void serialEvent(Serial myPort) {
@@ -59,5 +65,7 @@ void serialEvent(Serial myPort) {
       printVals += "   ";
     }
   }
+    sensorValue = inPacket[18];
+    sensorValue2 = inPacket[19];
 }
 
