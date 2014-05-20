@@ -53,7 +53,7 @@ void loop () {
   
   // currently leaving out response packet steps!
   
-  delay(100);
+  delay(300);
 }
 
 
