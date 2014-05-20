@@ -45,7 +45,8 @@ void loop () {
     payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
     
     for(int j = 0; j < numChannels; j++){
-      analogIn = getValue(i,j);
+      analogIn = map(getValue(i,j), 0, 255, 0, 100);
+      analogIn = constrain(analogIn, 0, 100);
       payload[j+1] = analogIn & 0xff; // append each multiplexed sensor to the packet
     }
     xbee.send(zbTx);
