@@ -1,10 +1,16 @@
-#define numMultiplexers 2
+#define numMultiplexers 4
 #define numChannels 8
 
 int analogIn = 0; // stores analog value
 
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
+
+const int smoothSampleSize = 8; // values to sample for smoothing
+int readings[smoothSampleSize];      // the readings from the analog input
+int smoothIndex = 0;                  // the index of the current reading
+int smoothTotal = 0;                  // the running total
+int smoothAvg = 0;                // the average
 
 int multiplexers [numMultiplexers][numChannels];
 
@@ -24,23 +30,24 @@ void setup() {
     pinMode(multi_1[bit], OUTPUT);
   }
   
-//   contactProcessing();
-
+  for ( int i = 0; i < smoothSampleSize; i++){
+     readings[i] = 0; // set smoothing vals to start at 0
+  }
+  
 }
 
 void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
+    Serial.print(i);
     for(int j = 0; j < numChannels; j++){
       analogIn = getValue(i,j);
-       Serial.print(i);
-       Serial.print(" : ");
-       Serial.print(j);
-       Serial.print(" : ");
+//       Serial.print(j);
+       Serial.print(" ");
        Serial.print(analogIn);
-       Serial.print("   |   ");
-       
+//       Serial.println();
     }
+    Serial.println();
   }    
   
   delay(5);
