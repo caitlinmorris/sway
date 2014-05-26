@@ -27,8 +27,6 @@ const int multi_4[] = {
 const int multi_5[] = {
   17,18,19};
   
-int inByte = 0;
-
 void setup() {
 
   Serial.begin(9600); // Setup Serial Port
