@@ -3,8 +3,8 @@
 
 #include <XBee.h>
 
-#define numMultiplexers 1
-#define numChannels 2
+#define numMultiplexers 2
+#define numChannels 8
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -17,9 +17,17 @@ int multiplexers [numMultiplexers][numChannels];
 uint8_t payload[] = { 0, 0, 0 }; // smaller payload for testing
 
 const int multi_0[] = {
-  9,10,11}; // array of the pins connected to the 4051 input
+  13,12,11}; // array of the pins connected to the 4051 input
 const int multi_1[] = {
-  6,7,8};
+  10,9,8};
+const int multi_2[] = {
+  7,6,5};
+const int multi_3[] = {
+  4,3,2};
+const int multi_4[] = {
+  14,15,16};
+const int multi_5[] = {
+  17,18,19};
   
 // SH + SL Address of receiving XBee
 XBeeAddress64 addr64 = XBeeAddress64(0x0013a200, 0x40a2684e);
@@ -71,6 +79,22 @@ int getValue( int multiplexer, int channel) {
     case 1:
       digitalPin = multi_1[bit];
       analogOut = A1;      
+      break;
+    case 2:
+      digitalPin = multi_2[bit];
+      analogOut = A2;      
+      break;
+    case 3:
+      digitalPin = multi_3[bit];
+      analogOut = A3;
+      break;
+    case 4:
+      digitalPin = multi_4[bit];
+      analogOut = A4;
+      break;
+    case 5:
+      digitalPin = multi_5[bit];
+      analogOut = A5;
       break;
     default:
       break;

@@ -1,4 +1,4 @@
-#define numMultiplexers 4
+#define numMultiplexers 2
 #define numChannels 8
 
 int analogIn = 0; // stores analog value
@@ -15,9 +15,17 @@ int smoothAvg = 0;                // the average
 int multiplexers [numMultiplexers][numChannels];
 
 const int multi_0[] = {
-  11,12,13}; // array of the pins connected to the 4051 input
+  13,12,11}; // array of the pins connected to the 4051 input
 const int multi_1[] = {
-  8,9,10};
+  10,9,8};
+const int multi_2[] = {
+  7,6,5};
+const int multi_3[] = {
+  4,3,2};
+const int multi_4[] = {
+  14,15,16};
+const int multi_5[] = {
+  17,18,19};
   
 int inByte = 0;
 
@@ -39,9 +47,21 @@ void setup() {
 void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
-    Serial.print(i);
+//    Serial.print(i);
     for(int j = 0; j < numChannels; j++){
       analogIn = getValue(i,j);
+     /* 
+     // needs to be array-ified to work for each individual sensor
+      smoothTotal = smoothTotal - readings[smoothIndex];
+      readings[smoothIndex] = getValue(i,j);
+      smoothTotal = smoothTotal + readings[smoothIndex];
+      smoothIndex = smoothIndex+1;
+      
+      if(smoothIndex >= smoothSampleSize)
+        smoothIndex = 0;
+        
+       smoothAverage = smoothTotal / smoothSampleSize;
+      */
 //       Serial.print(j);
        Serial.print(" ");
        Serial.print(analogIn);
@@ -71,6 +91,22 @@ int getValue( int multiplexer, int channel) {
       digitalPin = multi_1[bit];
       analogOut = A1;      
       break;
+    case 2:
+      digitalPin = multi_2[bit];
+      analogOut = A2;      
+      break;
+    case 3:
+      digitalPin = multi_3[bit];
+      analogOut = A3;
+      break;
+    case 4:
+      digitalPin = multi_4[bit];
+      analogOut = A4;
+      break;
+    case 5:
+      digitalPin = multi_5[bit];
+      analogOut = A5;
+      break;
     default:
       break;
     }
@@ -81,13 +117,5 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
-
-void contactProcessing() {
-  while(Serial.available() <= 0){
-    Serial.print('A');
-    delay(10);
-  }
-}
-
 
 
