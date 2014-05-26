@@ -11,16 +11,21 @@ int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
 const int smoothSampleSize = 8; // values to sample for smoothing
-int readings[smoothSampleSize];      // the readings from the analog input
-int smoothIndex = 0;                  // the index of the current reading
-int smoothTotal = 0;                  // the running total
-int smoothAvg = 0;                // the average
+//int readings[smoothSampleSize];      // the readings from the analog input
+//int smoothIndex = 0;                  // the index of the current reading
+//int smoothTotal = 0;                  // the running total
+//int smoothAvg = 0;                // the average
 
 XBee xbee = XBee();
 
 int multiplexers [numMultiplexers][numChannels];
 //uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // numChannels + 1 (usually 9 total)
 uint8_t payload[] = { 0, 0, 0, 0, 0 }; // smaller payload for testing
+
+int smoothIndex [numMultiplexers][numChannels];
+int smoothTotal [numMultiplexers][numChannels];
+int smoothAvg [numMultiplexers][numChannels];
+int readings [numMultiplexers][numChannels][smoothSampleSize];
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -49,6 +54,14 @@ void setup() {
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
     pinMode(multi_1[bit], OUTPUT);
   }
+  
+  for(int i=0; i < numMultiplexers; i++){
+    for(int j=0; j < numChannels; j++){
+      for(int k=0; k < smoothSampleSize; k++){
+        readings[i][j][k] = 0;
+      }
+    }
+  }
 }
 
 void loop () {
@@ -62,18 +75,15 @@ void loop () {
       analogIn = map(getValue(i,j), 200, 550, 0, 100);
       analogIn = constrain(analogIn, 0, 100);
       
-      /* 
-     // needs to be array-ified to work for each individual sensor
-      smoothTotal = smoothTotal - readings[smoothIndex];
-      readings[smoothIndex] = getValue(i,j);
-      smoothTotal = smoothTotal + readings[smoothIndex];
-      smoothIndex = smoothIndex+1;
+      smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
+      readings[i][j][smoothIndex[i][j]] = getValue(i,j);
+      smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+      smoothIndex[i][j] = smoothIndex[i][j] + 1;
       
-      if(smoothIndex >= smoothSampleSize)
-        smoothIndex = 0;
+      if(smoothIndex[i][j] > smoothSampleSize)
+        smoothIndex[i][j] = 0;
         
-       smoothAverage = smoothTotal / smoothSampleSize;
-      */
+      smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
       
       payload[j+1] = analogIn & 0xff; // append each multiplexed sensor to the packet
     }
