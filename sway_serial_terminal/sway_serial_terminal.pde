@@ -36,7 +36,7 @@ void draw() {
 
   for (int i = 0; i < numMultiplexers; i++) {
     for (int j = 0; j < numChannels; j++) {
-      ellipse(200+(i*100), 200+(j*100), circleSizes[i][j], circleSizes[i][j]);
+      ellipse(200+(j*150), 200+(i*150), circleSizes[i][j], circleSizes[i][j]);
     }
   }
 }
