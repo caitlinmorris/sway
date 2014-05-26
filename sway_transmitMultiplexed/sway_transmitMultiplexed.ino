@@ -13,8 +13,8 @@ int analogOut = A0; // analog output pin; will change in getValue switch case
 XBee xbee = XBee();
 
 int multiplexers [numMultiplexers][numChannels];
-//uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // numChannels + 1 (usually 9 total)
-uint8_t payload[] = { 0, 0, 0 }; // smaller payload for testing
+uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // numChannels + 1 (usually 9 total)
+//uint8_t payload[] = { 0, 0, 0 }; // smaller payload for testing
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -53,7 +53,7 @@ void loop () {
     payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
     
     for(int j = 0; j < numChannels; j++){
-      analogIn = map(getValue(i,j), 0, 255, 0, 100);
+      analogIn = map(getValue(i,j), 200, 550, 0, 100);
       analogIn = constrain(analogIn, 0, 100);
       payload[j+1] = analogIn & 0xff; // append each multiplexed sensor to the packet
     }
@@ -62,7 +62,7 @@ void loop () {
   
   // currently leaving out response packet steps!
   
-  delay(20);
+  delay(10);
 }
 
 
