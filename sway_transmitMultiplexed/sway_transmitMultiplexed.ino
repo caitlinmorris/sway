@@ -10,6 +10,12 @@ int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
+const int smoothSampleSize = 8; // values to sample for smoothing
+int readings[smoothSampleSize];      // the readings from the analog input
+int smoothIndex = 0;                  // the index of the current reading
+int smoothTotal = 0;                  // the running total
+int smoothAvg = 0;                // the average
+
 XBee xbee = XBee();
 
 int multiplexers [numMultiplexers][numChannels];
@@ -55,14 +61,29 @@ void loop () {
     for(int j = 0; j < numChannels; j++){
       analogIn = map(getValue(i,j), 200, 550, 0, 100);
       analogIn = constrain(analogIn, 0, 100);
+      
+      /* 
+     // needs to be array-ified to work for each individual sensor
+      smoothTotal = smoothTotal - readings[smoothIndex];
+      readings[smoothIndex] = getValue(i,j);
+      smoothTotal = smoothTotal + readings[smoothIndex];
+      smoothIndex = smoothIndex+1;
+      
+      if(smoothIndex >= smoothSampleSize)
+        smoothIndex = 0;
+        
+       smoothAverage = smoothTotal / smoothSampleSize;
+      */
+      
       payload[j+1] = analogIn & 0xff; // append each multiplexed sensor to the packet
     }
     xbee.send(zbTx);
+//    delay(10);
   }    
   
   // currently leaving out response packet steps!
   
-  delay(20);
+  delay(30);
 }
 
 
