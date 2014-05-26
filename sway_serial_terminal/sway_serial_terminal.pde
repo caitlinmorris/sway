@@ -26,62 +26,68 @@ int [] inPacket = new int [packetByteLength]; // should be the size of whatever 
 void setup() {
   size(1200, 800);
   println(Serial.list());
-  portNum = Serial.list()[7];
-  myPort = new Serial(this, portNum, 9600);  
+  portNum = Serial.list()[0];
+  myPort = new Serial(this, portNum, 9600);
 }
 
 void draw() {
-  
+
   background(0);
-  
-  for(int i = 0; i < numMultiplexers; i++){
-     for(int j = 0; j < numChannels; j++){
-        ellipse(200+(i*100), 200+(j*100), circleSizes[i][j], circleSizes[i][j]);
-     } 
+
+  for (int i = 0; i < numMultiplexers; i++) {
+    for (int j = 0; j < numChannels; j++) {
+      ellipse(200+(i*100), 200+(j*100), circleSizes[i][j], circleSizes[i][j]);
+    }
   }
-    
 }
 
 void serialEvent(Serial myPort) {
 
-  int inByte = myPort.read();
+  try {
 
-  if (inByte == startByte) {
-    packetIndex = 0;
-    saveIndex = 0;
-    println(printVals);
-    printVals = "";
+    int inByte = myPort.read();
 
-    for (int i = 0; i < packetByteLength; i++) {
-      inPacket[i] = 0;
-    }
+    if (inByte == startByte) {
+      packetIndex = 0;
+      saveIndex = 0;
+      println(printVals);
+      printVals = "";
 
-    inPacket[0] = inByte;
-    printVals += packetIndex;
-    printVals += ": ";
-    printVals += inByte;
-    printVals += "   ";
-    packetIndex++;
-  }
+      for (int i = 0; i < packetByteLength; i++) {
+        inPacket[i] = 0;
+      }
 
-  else {
-    inPacket[packetIndex] = inByte;
-    packetIndex++;
-        
-    if(packetIndex == 18){
-      multiplexerIndex = inByte;
-    }
-
-    if (packetIndex > 18) {
-      //    if (packetIndex == 17 || packetIndex == 18) {
+      inPacket[0] = inByte;
       printVals += packetIndex;
       printVals += ": ";
       printVals += inByte;
       printVals += "   ";
-      
-      circleSizes[multiplexerIndex][saveIndex] = inByte;
-      if(saveIndex < numChannels) saveIndex++;
+      packetIndex++;
     }
+
+    else {
+      inPacket[packetIndex] = inByte;
+      packetIndex++;
+
+      if (packetIndex == 18) {
+        multiplexerIndex = inByte;
+      }
+
+      if (packetIndex > 18) {
+        //    if (packetIndex == 17 || packetIndex == 18) {
+        printVals += packetIndex;
+        printVals += ": ";
+        printVals += inByte;
+        printVals += "   ";
+
+        circleSizes[multiplexerIndex][saveIndex] = inByte;
+        if (saveIndex < numChannels) saveIndex++;
+      }
+    }
+  }
+
+  catch(Exception e) {
+    println("some kind of failure");
   }
 }
 
