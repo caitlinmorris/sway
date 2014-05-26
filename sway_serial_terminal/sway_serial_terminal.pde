@@ -16,6 +16,8 @@ int packetIndex = 0;
 int numMultiplexers = 1;
 int numChannels = 4;
 int circleSizes [][] = new int [numMultiplexers][numChannels];
+int saveIndex = 0; //this is kind of sketchy
+int multiplexerIndex = 0; // also kind of sketchy
 
 String printVals = "";
 
@@ -44,6 +46,7 @@ void serialEvent(Serial myPort) {
 
   if (inByte == startByte) {
     packetIndex = 0;
+    saveIndex = 0;
     println(printVals);
     printVals = "";
 
@@ -62,13 +65,20 @@ void serialEvent(Serial myPort) {
   else {
     inPacket[packetIndex] = inByte;
     packetIndex++;
+        
+    if(packetIndex == 18){
+      multiplexerIndex = inByte;
+    }
 
-    if (packetIndex > 17) {
+    if (packetIndex > 18) {
       //    if (packetIndex == 17 || packetIndex == 18) {
       printVals += packetIndex;
       printVals += ": ";
       printVals += inByte;
       printVals += "   ";
+      
+      circleSizes[multiplexerIndex][saveIndex] = inByte;
+      if(saveIndex < numChannels) saveIndex++;
     }
   }
 }
