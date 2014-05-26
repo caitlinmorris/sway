@@ -19,7 +19,7 @@ int [] inPacket = new int [packetByteLength]; // should be the size of whatever 
 void setup() {
   size(200, 200);
   println(Serial.list());
-  portNum = Serial.list()[5];
+  portNum = Serial.list()[7];
   myPort = new Serial(this, portNum, 9600);  
 }
 
