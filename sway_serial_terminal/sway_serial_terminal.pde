@@ -24,13 +24,15 @@ String printVals = "";
 int [] inPacket = new int [packetByteLength]; // should be the size of whatever the expected packet is
 
 void setup() {
-  size(200, 200);
+  size(1200, 800);
   println(Serial.list());
   portNum = Serial.list()[7];
   myPort = new Serial(this, portNum, 9600);  
 }
 
 void draw() {
+  
+  background(0);
   
   for(int i = 0; i < numMultiplexers; i++){
      for(int j = 0; j < numChannels; j++){
