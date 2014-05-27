@@ -1,18 +1,18 @@
-#define numMultiplexers 2
+#define numMultiplexers 4
 #define numChannels 8
 
 int analogIn = 0; // stores analog value
-
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
 const int smoothSampleSize = 8; // values to sample for smoothing
-int readings[smoothSampleSize];      // the readings from the analog input
-int smoothIndex = 0;                  // the index of the current reading
-int smoothTotal = 0;                  // the running total
-int smoothAvg = 0;                // the average
 
 int multiplexers [numMultiplexers][numChannels];
+
+int smoothIndex [numMultiplexers][numChannels];
+int smoothTotal [numMultiplexers][numChannels];
+int smoothAvg [numMultiplexers][numChannels];
+int readings [numMultiplexers][numChannels][smoothSampleSize];
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -23,10 +23,12 @@ const int multi_2[] = {
 const int multi_3[] = {
   4,3,2};
 const int multi_4[] = {
-  14,15,16};
+  22,24,26};
 const int multi_5[] = {
-  17,18,19};
-  
+  28,30,32};
+const int multi_6[] = {
+  34, 36, 38};
+
 void setup() {
 
   Serial.begin(9600); // Setup Serial Port
@@ -35,40 +37,44 @@ void setup() {
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
     pinMode(multi_1[bit], OUTPUT);
   }
-  
-  for ( int i = 0; i < smoothSampleSize; i++){
-     readings[i] = 0; // set smoothing vals to start at 0
+
+  for(int i=0; i < numMultiplexers; i++){
+    for(int j=0; j < numChannels; j++){
+      for(int k=0; k < smoothSampleSize; k++){
+        readings[i][j][k] = 0;
+      }
+    }
   }
-  
+
 }
 
 void loop () {
 
-  for(int i = 0; i < numMultiplexers; i++){
-//    Serial.print(i);
+  for(int i = 3; i < numMultiplexers; i++){
+    Serial.print(i);
+    Serial.print(" ");
     for(int j = 0; j < numChannels; j++){
-      analogIn = getValue(i,j);
-     /* 
-     // needs to be array-ified to work for each individual sensor
-      smoothTotal = smoothTotal - readings[smoothIndex];
-      readings[smoothIndex] = getValue(i,j);
-      smoothTotal = smoothTotal + readings[smoothIndex];
-      smoothIndex = smoothIndex+1;
+//      analogIn = map(getValue(i,j), 200, 550, 0, 100);
+//      analogIn = constrain(analogIn, 0, 100);
       
-      if(smoothIndex >= smoothSampleSize)
-        smoothIndex = 0;
-        
-       smoothAverage = smoothTotal / smoothSampleSize;
-      */
-//       Serial.print(j);
-       Serial.print(" ");
-       Serial.print(analogIn);
-//       Serial.println();
+      analogIn = getValue(i,j);
+
+      smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
+      readings[i][j][smoothIndex[i][j]] = analogIn;
+      smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+      smoothIndex[i][j] = smoothIndex[i][j] + 1;
+
+      if(smoothIndex[i][j] > smoothSampleSize)
+        smoothIndex[i][j] = 0;
+
+      smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+      Serial.print(smoothAvg[i][j]);
+      Serial.print(" ");
     }
     Serial.println();
   }    
-  
-  delay(5);
+
+  delay(20);
 }
 
 
@@ -81,7 +87,7 @@ int getValue( int multiplexer, int channel) {
     //int pin = multiName[bit]; // the pin wired to the multiplexer select bit
 
     switch (multiplexer) {
-      case 0:
+    case 0:
       digitalPin = multi_0[bit];
       analogOut = A0;
       break;
@@ -105,6 +111,10 @@ int getValue( int multiplexer, int channel) {
       digitalPin = multi_5[bit];
       analogOut = A5;
       break;
+    case 6:
+      digitalPin = multi_6[bit];
+      analogOut = A6;
+      break;
     default:
       break;
     }
@@ -115,5 +125,6 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
 
 
