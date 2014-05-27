@@ -1,11 +1,11 @@
-#define numMultiplexers 4
+#define numMultiplexers 6
 #define numChannels 8
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
-const int smoothSampleSize = 8; // values to sample for smoothing
+const int smoothSampleSize = 10; // values to sample for smoothing
 
 int multiplexers [numMultiplexers][numChannels];
 
@@ -50,14 +50,21 @@ void setup() {
 
 void loop () {
 
-  for(int i = 3; i < numMultiplexers; i++){
+  for(int i = 0; i < numMultiplexers; i++){
+    
+    if(i == 5){
+    
     Serial.print(i);
     Serial.print(" ");
     for(int j = 0; j < numChannels; j++){
-//      analogIn = map(getValue(i,j), 200, 550, 0, 100);
-//      analogIn = constrain(analogIn, 0, 100);
-      
+      /*analogIn = map(getValue(i,j), 200, 550, 0, 100);
+      analogIn = constrain(analogIn, 0, 100);
+      */
       analogIn = getValue(i,j);
+
+      Serial.print( analogIn );
+      Serial.print(" ");
+      
 
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
       readings[i][j][smoothIndex[i][j]] = analogIn;
@@ -68,10 +75,13 @@ void loop () {
         smoothIndex[i][j] = 0;
 
       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-      Serial.print(smoothAvg[i][j]);
-      Serial.print(" ");
+//      Serial.print(smoothAvg[i][j]);
+//      Serial.print(" ");
     }
     Serial.println();
+    
+    }
+    
   }    
 
   delay(20);
