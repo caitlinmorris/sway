@@ -11,10 +11,6 @@ int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
 const int smoothSampleSize = 8; // values to sample for smoothing
-//int readings[smoothSampleSize];      // the readings from the analog input
-//int smoothIndex = 0;                  // the index of the current reading
-//int smoothTotal = 0;                  // the running total
-//int smoothAvg = 0;                // the average
 
 XBee xbee = XBee();
 
@@ -36,9 +32,9 @@ const int multi_2[] = {
 const int multi_3[] = {
   4,3,2};
 const int multi_4[] = {
-  14,15,16};
+  22,24,26};
 const int multi_5[] = {
-  17,18,19};
+  28,30,32};
   
 // SH + SL Address of receiving XBee
 XBeeAddress64 addr64 = XBeeAddress64(0x0013a200, 0x40a2684e);
@@ -76,7 +72,7 @@ void loop () {
       analogIn = constrain(analogIn, 0, 100);
       
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-      readings[i][j][smoothIndex[i][j]] = getValue(i,j);
+      readings[i][j][smoothIndex[i][j]] = analogIn;
       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
       smoothIndex[i][j] = smoothIndex[i][j] + 1;
       
