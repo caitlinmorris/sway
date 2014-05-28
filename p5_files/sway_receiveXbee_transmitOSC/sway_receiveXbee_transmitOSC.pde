@@ -1,6 +1,9 @@
 /* 
 caitlin morris + lisa kori chung, may 2014
 adapted from a variety of sketches from 'making things talk', xbee-arduino library, and arduino references
+
+Receives data from 3 xbees, shuffles it out into a single array of OSC data sending to Max/MSP
+
 */
 
 import processing.serial.*;
