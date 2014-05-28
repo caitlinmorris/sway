@@ -1,0 +1,26 @@
+xbee firmware settings:
+
+COORDINATOR 
+Firmware: Coordinator API 2, Version 21A7
+Pan ID: 1988
+Destination: none set (default 0)
+Serial: 0013A200 40B19135
+Baud: 9600
+Node Identifier: coordinator
+
+ROUTERS
+Firmware: Router API 2, Version 23A7
+Pan ID: 1988
+Destination: 0013A200 40B19135 (coordinator serial)
+Baud: 9600
+Node Identifier: router1, router2, router3
+
+Router Serials:
+1: 40AF5A01
+2: 40A74122
+3: 40B471DF
+
+
+16 bit addressing— leave set at default (FFFE or FFFF) to broadcast or use serial number instead  
+
+ 
