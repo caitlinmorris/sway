@@ -36,8 +36,6 @@ const int multi_4[] = {
   22,24,26};
 const int multi_5[] = {
   28,30,32};
-const int multi_6[] = {
-  34, 36, 38};
 
 void setup() {
 
@@ -50,7 +48,7 @@ void setup() {
     pinMode(multi_3[bit], OUTPUT);
     pinMode(multi_4[bit], OUTPUT);
     pinMode(multi_5[bit], OUTPUT);
-    pinMode(multi_6[bit], OUTPUT);  }
+  }
 
   for(int i=0; i < numMultiplexers; i++){
     for(int j=0; j < numChannels; j++){
@@ -134,10 +132,6 @@ int getValue( int multiplexer, int channel) {
     case 5:
       digitalPin = multi_5[bit];
       analogOut = A5;
-      break;
-    case 6:
-      digitalPin = multi_6[bit];
-      analogOut = A6;
       break;
     default:
       break;
