@@ -17,5 +17,11 @@ sum up total displacement for each zone into a single value
 arrange displacement values into array for sending to maxMSP
 communication with maxMSP
 
+maxMSP:
+parse OSC bundles into individual MIDI parameters
+include simple MIDI trigger when sensor zone becomes active
+arrange MIDI slider presentation to create a visual reference, or map, of sensor activity
+send all MIDI data to Live
+
 Hardware:
 lots of debugging
