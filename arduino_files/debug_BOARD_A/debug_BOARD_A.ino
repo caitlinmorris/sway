@@ -156,9 +156,6 @@ int getValue( int multiplexer, int channel) {
 
     for(int bit = 0; bit < 3; bit++){
 
-    // there's something wrong here, maybe because multi_0 isn't actually reading as a String, but rather some other kind of array name..
-    //int pin = multiName[bit]; // the pin wired to the multiplexer select bit
-
     switch (multiplexer) {
     case 0:
       digitalPin = multi_0[bit];
