@@ -65,10 +65,10 @@ void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
     
-    if(i == 2){
+//    if(i == 4){
     
-//    Serial.print(i);
-//    Serial.print(" ");
+    Serial.print(i);
+    Serial.print(" ");
     for(int j = 0; j < numChannels; j++){
       /*analogIn = map(getValue(i,j), 200, 550, 0, 100);
       analogIn = constrain(analogIn, 0, 100);
@@ -96,7 +96,7 @@ void loop () {
     
     }
     
-  }    
+//  }    
 
   delay(20);
 }

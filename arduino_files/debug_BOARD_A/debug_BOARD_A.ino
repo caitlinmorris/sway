@@ -63,7 +63,7 @@ void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
     
-    if(i == 2){
+    if(i == 5){
     
 //    Serial.print(i);
 //    Serial.print(" ");
