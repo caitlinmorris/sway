@@ -27,7 +27,8 @@ XBee xbee = XBee();
 
 int multiplexers [numMultiplexers][numChannels];
 
-uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0 }; // numMultiplexers + 1
+uint8_t payload[] = { 
+  0, 0, 0, 0, 0, 0, 0 }; // numMultiplexers + 1
 
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
@@ -107,7 +108,7 @@ void loop () {
 
   // send one packet per multiplexer
   for(int i = 0; i < numMultiplexers; i++){
-    
+
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
     payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
@@ -116,31 +117,47 @@ void loop () {
 
       analogIn = getValue(i,j);
 
-      smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-      readings[i][j][smoothIndex[i][j]] = analogIn;
-      smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
-      smoothIndex[i][j] = smoothIndex[i][j] + 1;
+      /* // IMPLEMENT SMOOTHING LATER
+       
+       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
+       readings[i][j][smoothIndex[i][j]] = analogIn;
+       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+       smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       
+       if(smoothIndex[i][j] > smoothSampleSize)
+       smoothIndex[i][j] = 0;
+       
+       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+       
+       if(smoothAvg[i][j] > sensorMax[i][j]){
+       displacement[i][j] = constrain((smoothAvg[i][j] - sensorMax[i][j]),0,126);
+       }
+       else if(smoothAvg[i][j] < sensorMin[i][j]){
+       displacement[i][j] = constrain((sensorMin[i][j] - smoothAvg[i][j]),0,126);
+       }
+       else displacement[i][j] = 0;
+       
+       */
 
-      if(smoothIndex[i][j] > smoothSampleSize)
-        smoothIndex[i][j] = 0;
-
-      smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-
-      if(smoothAvg[i][j] > sensorMax[i][j]){
-        displacement[i][j] = constrain((smoothAvg[i][j] - sensorMax[i][j]),0,126);
+      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
+        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, 200, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15); 
       }
-      else if(smoothAvg[i][j] < sensorMin[i][j]){
-        displacement[i][j] = constrain((sensorMin[i][j] - smoothAvg[i][j]),0,126);
+      else if (analogIn < sensorMin[i][j]){
+        displacement[i][j] = map(sensorMin[i][j], 0, 200, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15);
       }
-      else displacement[i][j] = 0;
-      
+      else {
+        displacement[i][j] = 0;
+      }
+
       displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
     }
-    
+
     payload[i+1] = displacementSum[i] & 0xff; // append each multiplexed sensor to the packet
     //    delay(10);
   }    
-  
+
   xbee.send(zbTx);
 
   // currently leaving out response packet steps!
@@ -189,5 +206,6 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
 
 
