@@ -1,12 +1,12 @@
 /*
 caitlin morris + lisa kori chung, may 2014
-
-DEBUG FILE USING SERIAL COMMUNICATION
-
-BOARD A (blocks A1 - C4) : 6 multiplexers
-multi_5 : 7 sensors
-
-*/
+ 
+ DEBUG FILE USING SERIAL COMMUNICATION
+ 
+ BOARD A (blocks A1 - C4) : 6 multiplexers
+ multi_5 : 7 sensors
+ 
+ */
 
 #define numMultiplexers 6
 #define numChannels 8
@@ -17,12 +17,19 @@ int analogOut = A0; // analog output pin; will change in getValue switch case
 
 const int smoothSampleSize = 10; // values to sample for smoothing
 
+int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
+int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
+int sensorMax [numMultiplexers][numChannels];   // maximum sensor value for calibration
+
 int multiplexers [numMultiplexers][numChannels];
 
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
 int smoothAvg [numMultiplexers][numChannels];
 int readings [numMultiplexers][numChannels][smoothSampleSize];
+
+int displacement [numMultiplexers][numChannels];
+int displacementSum [numMultiplexers];
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -55,6 +62,30 @@ void setup() {
       for(int k=0; k < smoothSampleSize; k++){
         readings[i][j][k] = 0;
       }
+      sensorMin[i][j] = 1023;
+      sensorMax[i][j] = 0;
+      displacement[i][j] = 0;
+    }
+    displacementSum[i] = 0;
+  }
+
+  // calibrate during the first five seconds 
+  while (millis() < 5000) {
+
+    for(int i = 0; i < numMultiplexers; i++){
+      for(int j = 0; j < numChannels; j++){
+        calibrationValue[i][j] = getValue(i,j);
+
+        // record the maximum sensor value
+        if (calibrationValue[i][j] > sensorMax[i][j]) {
+          sensorMax[i][j] = calibrationValue[i][j];
+        }
+
+        // record the minimum sensor value
+        if (calibrationValue[i][j] < sensorMin[i][j]) {
+          sensorMin[i][j] = calibrationValue[i][j];
+        }
+      }
     }
   }
 }
@@ -62,20 +93,15 @@ void setup() {
 void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
-    
-    if(i == 5){
-    
-//    Serial.print(i);
-//    Serial.print(" ");
-    for(int j = 0; j < numChannels; j++){
-      /*analogIn = map(getValue(i,j), 200, 550, 0, 100);
-      analogIn = constrain(analogIn, 0, 100);
-      */
-      analogIn = getValue(i,j);
 
-      Serial.print( analogIn );
-      Serial.print(" ");
-      
+    Serial.print(i);
+    Serial.print(" ");
+
+    displacementSum[i] = 0; // reset displacement sum value of each multiplexer
+
+    for(int j = 0; j < numChannels; j++){
+
+      analogIn = getValue(i,j);
 
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
       readings[i][j][smoothIndex[i][j]] = analogIn;
@@ -86,17 +112,21 @@ void loop () {
         smoothIndex[i][j] = 0;
 
       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-      
-//      Serial.print(smoothAvg[i][j]);
-//      Serial.print(" ");
-    }
-    Serial.println();
-    
-    }
-    
-  }    
 
-  delay(20);
+      if(smoothAvg[i][j] > sensorMax[i][j]){
+        displacement[i][j] = constrain((smoothAvg[i][j] - sensorMax[i][j]),0,126);
+      }
+      else if(smoothAvg[i][j] < sensorMin[i][j]){
+        displacement[i][j] = constrain((sensorMin[i][j] - smoothAvg[i][j]),0,126);
+      }
+      else displacement[i][j] = 0;
+
+      displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
+    }
+    Serial.print( displacementSum [i]);
+  }    
+  Serial.println();
+  delay(10);
 }
 
 
@@ -143,6 +173,7 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
 
 
 
