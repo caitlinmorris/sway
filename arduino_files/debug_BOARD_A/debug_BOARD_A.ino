@@ -94,8 +94,8 @@ void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
 
-    Serial.print(i);
-    Serial.print(" ");
+    //    Serial.print(i);
+    //    Serial.print(" ");
 
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
@@ -103,28 +103,49 @@ void loop () {
 
       analogIn = getValue(i,j);
 
+      // IMPLEMENT SMOOTHING LATER
+      /*
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-      readings[i][j][smoothIndex[i][j]] = analogIn;
-      smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
-      smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       readings[i][j][smoothIndex[i][j]] = analogIn;
+       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+       smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       
+       if(smoothIndex[i][j] > smoothSampleSize)
+       smoothIndex[i][j] = 0;
+       
+       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+       
+       if(smoothAvg[i][j] > sensorMax[i][j]){
+       displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else if(smoothAvg[i][j] < sensorMin[i][j]){
+       displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else displacement[i][j] = 0;
+       */
 
-      if(smoothIndex[i][j] > smoothSampleSize)
-        smoothIndex[i][j] = 0;
-
-      smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-
-      if(smoothAvg[i][j] > sensorMax[i][j]){
-        displacement[i][j] = constrain((smoothAvg[i][j] - sensorMax[i][j]),0,126);
+      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
+        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, 200, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15); 
       }
-      else if(smoothAvg[i][j] < sensorMin[i][j]){
-        displacement[i][j] = constrain((sensorMin[i][j] - smoothAvg[i][j]),0,126);
+      else if (analogIn < sensorMin[i][j]){
+        displacement[i][j] = map(sensorMin[i][j], 0, 200, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15);
       }
-      else displacement[i][j] = 0;
-
+      else {
+        displacement[i][j] = 0;
+      }
       displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
+
+      analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
+      displacementSum[i] += analogIn;  
     }
     Serial.print( displacementSum [i]);
+    Serial.print(" ");
   }    
+
   Serial.println();
   delay(10);
 }
@@ -173,6 +194,7 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
 
 
 
