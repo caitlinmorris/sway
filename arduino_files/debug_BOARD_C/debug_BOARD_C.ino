@@ -10,19 +10,30 @@ multi_5 : 2 sensors
 
 #define numMultiplexers 6
 #define numChannels 8
+#define amountOfVariance 100 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
+uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
+
+/* CALIBRATION INITIALIZATION */
+int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
+int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
+int sensorMax [numMultiplexers][numChannels];   // maximum sensor value for calibration
+
+/* SMOOTHING INITIALIZATION */
 const int smoothSampleSize = 10; // values to sample for smoothing
-
-int multiplexers [numMultiplexers][numChannels];
-
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
 int smoothAvg [numMultiplexers][numChannels];
 int readings [numMultiplexers][numChannels][smoothSampleSize];
+
+/* DISPLACEMENT INITIALIZATION */
+int displacement [numMultiplexers][numChannels]; // this is the difference-from-normal of each individual sensor
+int displacementSum [numMultiplexers]; // this is the total difference for each multiplexer
+// displacementSum is the value that gets sent via XBee
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -36,8 +47,6 @@ const int multi_4[] = {
   22,24,26};
 const int multi_5[] = {
   28,30,32};
-const int multi_6[] = {
-  34, 36, 38};
 
 void setup() {
 
@@ -57,6 +66,30 @@ void setup() {
       for(int k=0; k < smoothSampleSize; k++){
         readings[i][j][k] = 0;
       }
+      sensorMin[i][j] = 1023;
+      sensorMax[i][j] = 0;
+      displacement[i][j] = 0;
+    }
+    displacementSum[i] = 0;
+  }
+  
+  // calibrate during the first five seconds 
+  while (millis() < 5000) {
+
+    for(int i = 0; i < numMultiplexers; i++){
+      for(int j = 0; j < numChannels; j++){
+        calibrationValue[i][j] = getValue(i,j);
+
+        // record the maximum sensor value
+        if (calibrationValue[i][j] > sensorMax[i][j]) {
+          sensorMax[i][j] = calibrationValue[i][j];
+        }
+
+        // record the minimum sensor value
+        if (calibrationValue[i][j] < sensorMin[i][j]) {
+          sensorMin[i][j] = calibrationValue[i][j];
+        }
+      }
     }
   }
 }
@@ -64,41 +97,63 @@ void setup() {
 void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
-    
-    if(i == 3){
-    
-//    Serial.print(i);
-//    Serial.print(" ");
+
+    displacementSum[i] = 0; // reset displacement sum value of each multiplexer
+
     for(int j = 0; j < numChannels; j++){
-      /*analogIn = map(getValue(i,j), 200, 550, 0, 100);
-      analogIn = constrain(analogIn, 0, 100);
-      */
+
       analogIn = getValue(i,j);
 
-      Serial.print( analogIn );
-      Serial.print(" ");
-      
-
+      // IMPLEMENT SMOOTHING LATER
+      /*
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-      readings[i][j][smoothIndex[i][j]] = analogIn;
-      smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
-      smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       readings[i][j][smoothIndex[i][j]] = analogIn;
+       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+       smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       
+       if(smoothIndex[i][j] > smoothSampleSize)
+       smoothIndex[i][j] = 0;
+       
+       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+       
+       if(smoothAvg[i][j] > sensorMax[i][j]){
+       displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else if(smoothAvg[i][j] < sensorMin[i][j]){
+       displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else displacement[i][j] = 0;
+       */
 
-      if(smoothIndex[i][j] > smoothSampleSize)
-        smoothIndex[i][j] = 0;
+      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
+        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15); 
+      }
+      else if (analogIn < sensorMin[i][j]){
+        displacement[i][j] = map(sensorMin[i][j], 0, amountOfVariance, 0, 15);
+        displacement[i][j] = constrain(displacement[i][j], 0, 15);
+      }
+      else {
+        displacement[i][j] = 0;
+      }
+      displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
 
-      smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-      
-//      Serial.print(smoothAvg[i][j]);
-//      Serial.print(" ");
+      analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
+      displacementSum[i] += analogIn;  
     }
-    Serial.println();
-    
-    }
-    
+    payload[i] = displacementSum[i] & 0xff;
   }    
 
-  delay(20);
+  for(int i=0; i < sizeof(payload); i++){
+    Serial.print(payload[i]);
+    Serial.print(" ");
+  }
+  
+  Serial.println(); // equivalent to xbee.send();
+
+  delay(50);
 }
 
 
