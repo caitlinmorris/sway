@@ -111,36 +111,14 @@ void loop () {
 
   // each multiplexer is an element in the displacementSum[] array
   for(int i = 0; i < numMultiplexers; i++){
-
+    
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
     for(int j = 0; j < numChannels; j++){
 
       analogIn = getValue(i,j);
-
-      /* // IMPLEMENT SMOOTHING LATER
-       
-       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-       readings[i][j][smoothIndex[i][j]] = analogIn;
-       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
-       smoothIndex[i][j] = smoothIndex[i][j] + 1;
-       
-       if(smoothIndex[i][j] > smoothSampleSize)
-       smoothIndex[i][j] = 0;
-       
-       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-       
-       if(smoothAvg[i][j] > sensorMax[i][j]){
-       displacement[i][j] = constrain((smoothAvg[i][j] - sensorMax[i][j]),0,126);
-       }
-       else if(smoothAvg[i][j] < sensorMin[i][j]){
-       displacement[i][j] = constrain((sensorMin[i][j] - smoothAvg[i][j]),0,126);
-       }
-       else displacement[i][j] = 0;
-       
-       */
-
       // map sensor down to 0-16 range so that with max 7 multiplexers the total sum will be within the 0-127 MIDI range
+      
       if(analogIn > sensorMax[i][j]){
         displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 16);
         displacement[i][j] = constrain(displacement[i][j], 0, 16); 
@@ -156,16 +134,23 @@ void loop () {
       displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
     }
 
-    payload[i] = displacementSum[i] & 0xff; // append each multiplexer's sum to the packet
+    //int wtf = 50;
+//    int wtf = test;
+    int wtf = displacementSum[i];
+    payload[i] = wtf & 0xff; // append each multiplexer's sum to the packet
   }
 
-  payload[6] = 150 & 0xff;  // because board A has no index-6 multiplexer, we fill with a dummy value
+  payload[6] = 6 & 0xff;  // because board A has no index-6 multiplexer, we fill with a dummy value
 
-  xbee.send(zbTx);
-
+//  xbee.send(zbTx);
+  
+  for(int i = 0; i < numMultiplexers; i++){
+    Serial.print(payload[i] + " ");
+  }
+  Serial.println();
   // currently leaving out response packet steps!
 
-  delay(30);
+  delay(50);
 }
 
 
