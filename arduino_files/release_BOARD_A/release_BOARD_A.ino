@@ -161,13 +161,13 @@ void loop () {
     payload[i] = displacementSum[i] & 0xff; // append each multiplexer's sum to the packet
   }
 
-  payload[6] = 150 & 0xff;  
+  payload[6] = 150 & 0xff;  // because board A has no index-6 multiplexer, we fill with a dummy value
 
   xbee.send(zbTx);
 
   // currently leaving out response packet steps!
 
-  delay(50);
+  delay(30);
 }
 
 
