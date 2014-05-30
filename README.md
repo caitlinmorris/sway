@@ -39,3 +39,13 @@ To upload any firmware onto the Arduinos, first disconnect the RX/TX header pin 
 **Testing with dummy data**
 
 To test the basic XBee router / controller communication, there are three files for sending a series of false data in the folder "dummy_xbee_transmitters" nested under "code_tests_archive".  The files are the same except for the false values that they're sending.
+
+**Working in Serial debug mode**
+
+Within each debug_BOARD_ file, you can debug print either each individual raw sensor reading, or debug print the sum of the total displacement (which precisely mimics the data that's sent via XBee in release mode).  Each debug file has a toggle at the start:
+
+    #define DEBUG_MODE 0 
+    //#define DEBUG_MODE 1
+    
+MODE 0 is for individual sensor printouts; MODE 1 is for total sum printouts.  Comment only one out before uploading the file.
+    
