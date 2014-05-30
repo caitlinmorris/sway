@@ -8,6 +8,10 @@ caitlin morris + lisa kori chung, may 2014
  
  */
 
+// SELECT DEBUG MODE HERE
+#define DEBUG_MODE 0 // for individual sensor readouts
+//#define DEBUG_MODE 1 // for composite sum readouts
+
 #define numMultiplexers 6
 #define numChannels 8
 #define amountOfVariance 100 // how much the sensor ranges from "normal", adjust as necessary with testing
@@ -16,7 +20,8 @@ int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
-uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
+uint8_t payload[] = { 
+  0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
 
 /* CALIBRATION INITIALIZATION */
 int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
@@ -128,29 +133,51 @@ void loop () {
        */
 
       if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
-        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
-        displacement[i][j] = constrain(displacement[i][j], 0, 15); 
+        if(DEBUG_MODE == 1){
+          displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
+          displacement[i][j] = constrain(displacement[i][j], 0, 15); 
+        }
+        else if(DEBUG_MODE == 0){
+          displacement[i][j] = analogIn - sensorMax[i][j];
+        }
       }
       else if (analogIn < sensorMin[i][j]){
-        displacement[i][j] = map(sensorMin[i][j], 0, amountOfVariance, 0, 15);
-        displacement[i][j] = constrain(displacement[i][j], 0, 15);
+        if(DEBUG_MODE == 1){
+          displacement[i][j] = map(sensorMin[i][j]-analogIn, 0, amountOfVariance, 0, 15);
+          displacement[i][j] = constrain(displacement[i][j], 0, 15);
+        }
+        else if(DEBUG_MODE == 0){
+          displacement[i][j] = sensorMin[i][j] - analogIn;
+        }
       }
       else {
         displacement[i][j] = 0;
       }
-      displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
 
-      analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
-      displacementSum[i] += analogIn;  
+      if( DEBUG_MODE == 1 ){
+        displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
+        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
+        displacementSum[i] += analogIn;  
+      }
+
+      else if (DEBUG_MODE == 0){
+        //        Serial.print(analogIn); // print actual values
+        Serial.print(displacement[i][j]); // print unconstrained displacement values
+        Serial.print(" ");
+      }
     }
-    payload[i] = displacementSum[i] & 0xff;
+    if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;
+    else if (DEBUG_MODE == 0) Serial.println();
   }    
 
-  for(int i=0; i < sizeof(payload); i++){
-    Serial.print(payload[i]);
-    Serial.print(" ");
+  if (DEBUG_MODE == 1){
+    for(int i=0; i < sizeof(payload); i++){
+      Serial.print(payload[i]);
+      Serial.print(" ");
+    }
   }
-  
+
+
   Serial.println(); // equivalent to xbee.send();
 
   delay(50);
@@ -197,6 +224,8 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
+
 
 
 
