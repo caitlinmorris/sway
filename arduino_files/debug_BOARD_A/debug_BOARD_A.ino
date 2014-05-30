@@ -97,6 +97,16 @@ void setup() {
       }
     }
   }
+  
+  for(int i = 0; i < numMultiplexers; i++){
+    Serial.print(i);
+    Serial.println(": ");
+    for(int j = 0; j < numChannels; j++){
+      Serial.print(sensorMax[i][j]);
+      Serial.print(" ");
+    }
+    Serial.println();
+  }
 }
 
 void loop () {
