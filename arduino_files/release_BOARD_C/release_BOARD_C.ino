@@ -145,7 +145,7 @@ void loop () {
         displacement[i][j] = constrain(displacement[i][j], 0, 16); 
       }
       else if (analogIn < sensorMin[i][j]){
-        displacement[i][j] = map(sensorMin[i][j], 0, amountOfVariance, 0, 16);
+        displacement[i][j] = map(sensorMin[i][j] - analogIn, 0, amountOfVariance, 0, 16);
         displacement[i][j] = constrain(displacement[i][j], 0, 16);
       }
       else {
