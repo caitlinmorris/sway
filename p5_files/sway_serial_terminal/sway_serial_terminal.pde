@@ -8,7 +8,7 @@ import processing.serial.*;
 Serial myPort; // the serial port you're using
 String portNum; // name of the serial port
 
-int packetByteLength = 26; // what determines size? for 9-piece payload should be 27?
+int packetByteLength = 27; // what determines size? for 9-piece payload should be 27?
 int startByte = 126; // a unique number that indicates the start of a new packet
 int packetIndex = 0;
 
@@ -30,7 +30,7 @@ int inVal3 = 0;
 void setup() {
   size(400, 400);
   println(Serial.list());
-  portNum = Serial.list()[4];
+  portNum = Serial.list()[5];
   myPort = new Serial(this, portNum, 9600);
 }
 
@@ -80,30 +80,33 @@ void serialEvent(Serial myPort) {
       inPacket[packetIndex] = inByte;
       packetIndex++;
 
-      if (packetIndex == 20) {
-        //        multiplexerIndex = inByte;
-        if (inPacket[11] == 167) {
+      if (packetIndex == 18) { // address piece, see also http://stackoverflow.com/questions/18502510/xbee-packet-format
+        if (inPacket[11] == 175) { //using second part of remote address for identification
           inVal1 = inByte;
-          println("inVal1 = " + inVal1);
+//          println("inVal1 = " + inVal1);
         }
 
-        else if (inPacket[11] == 175) {
+        else if (inPacket[11] == 167) {
           inVal2 = inByte;
-          println("inVal2 = " + inVal2);
+//          println("inVal2 = " + inVal2);
         }
         
         else if (inPacket[11] == 180) {
           inVal3 = inByte;
-          println("inVal3 = " + inVal3);
+//          println("inVal3 = " + inVal3);
         }
 
-        else println("inpacket = " + inPacket[12]);
+//        else println("inpacket = " + inPacket[12]);
       }
+      
+      if(packetIndex > 8){
 
       printVals += packetIndex;
       printVals += ": ";
       printVals += inByte;
       printVals += "   ";
+      
+      }
 
       //      }
     }
