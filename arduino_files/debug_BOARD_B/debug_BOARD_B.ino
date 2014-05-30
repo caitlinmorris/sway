@@ -14,7 +14,7 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 7
 #define numChannels 8
-#define amountOfVariance 200 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 100 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -175,7 +175,7 @@ void loop () {
 
       else if (DEBUG_MODE == 0){
         //        Serial.print(analogIn); // print actual values
-        Serial.print(displacement[i][j]);
+        Serial.print(displacement[i][j]); // print unconstrained displacement values
         Serial.print(" ");
       }
     }
