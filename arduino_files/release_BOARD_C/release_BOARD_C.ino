@@ -57,11 +57,7 @@ const int multi_4[] = {
   22,24,26};
 const int multi_5[] = {
   28,30,32};
-  
-// SH + SL Address of receiving XBee
-XBeeAddress64 addr64 = XBeeAddress64(0x0013a200, 0x40a2684e);
-ZBTxRequest zbTx = ZBTxRequest(addr64, payload, sizeof(payload));
-ZBTxStatusResponse txStatus = ZBTxStatusResponse();
+
   
 void setup() {
 
