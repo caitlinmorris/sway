@@ -48,4 +48,10 @@ Within each debug_BOARD_ file, you can debug print either each individual raw se
     //#define DEBUG_MODE 1
     
 MODE 0 is for individual sensor printouts; MODE 1 is for total sum printouts.  Comment only one out before uploading the file.
+
+**Library requirements**
+
+The Processing files in this repo are based on xbee-api : https://code.google.com/p/xbee-api/
+
+The Arduino files require the xbee-arduino library : https://code.google.com/p/xbee-arduino/
     
