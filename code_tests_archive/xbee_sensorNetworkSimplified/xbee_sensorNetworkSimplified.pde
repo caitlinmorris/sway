@@ -15,7 +15,8 @@ import com.rapplogic.xbee.api.zigbee.ZNetRxIoSampleResponse;
 String version = "1.11";
 
 // *** REPLACE WITH THE SERIAL PORT (COM PORT) FOR YOUR LOCAL XBEE ***
-String mySerialPort = "/dev/tty.usbserial-A603UIS4";
+String mySerialPort;
+//= "/dev/tty.usbserial-A603UIS4";
 
 // create and initialize a new xbee object
 XBee xbee = new XBee();
@@ -34,6 +35,7 @@ void setup() {
   // Print a list in case the selected one doesn't work out
   println("Available serial ports:");
   println(Serial.list());
+  mySerialPort = Serial.list()[4];
   try {
     // opens your serial port defined above, at 9600 baud
     xbee.open(mySerialPort, 9600);
@@ -111,11 +113,26 @@ SensorData getData() {
     // we wait here until a packet is received.
     XBeeResponse response = xbee.getResponse();
     // uncomment next line for additional debugging information
-    //println("Received response " + response.toString()); 
+    println("Received response " + response.toString()); 
+
+    /*
+//          int[] addressArray = ioSample.getRemoteAddress64().getAddress();
+      // parse the address int array into a formatted string
+      String[] hexAddress = new String[testAddress.length];
+      for (int i=0; i<addressArray.length;i++) {
+        // format each address byte with leading zeros:
+        hexAddress[i] = String.format("%02x", addressArray[i]);
+      }
+
+      // join the array together with colons for readability:
+      String senderAddress = join(hexAddress, ":"); 
+      println("Sender address: " + senderAddress);
+      data.address = senderAddress;
+      */
 
     // check that this frame is a valid I/O sample, then parse it as such
-    if (response.getApiId() == ApiId.ZNET_IO_SAMPLE_RESPONSE 
-      && !response.isError()) {
+//    if (response.getApiId() == ApiId.ZNET_IO_SAMPLE_RESPONSE && !response.isError()) {
+     if (response.getApiId() == ApiId.ZNET_IO_SAMPLE_RESPONSE) {
       ZNetRxIoSampleResponse ioSample = 
         (ZNetRxIoSampleResponse)(XBeeResponse) response;
 
@@ -132,6 +149,8 @@ SensorData getData() {
       String senderAddress = join(hexAddress, ":"); 
       print("Sender address: " + senderAddress);
       data.address = senderAddress;
+      
+      
       // get the value of the first input pin
       value = ioSample.getAnalog0();
       print(" analog value: " + value ); 
@@ -143,6 +162,7 @@ SensorData getData() {
     else {
       println("Got non-i/o data frame");
     }
+    
   }
   catch (XBeeException e) {
     println("Error receiving response: " + e);
