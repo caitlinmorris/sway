@@ -47,7 +47,7 @@ Within each debug_BOARD_ file, you can debug print either each individual raw se
     #define DEBUG_MODE 0 
     //#define DEBUG_MODE 1
     
-MODE 0 is for individual sensor printouts; MODE 1 is for total sum printouts.  Comment only one out before uploading the file.
+MODE 0 is for individual sensor printouts; MODE 1 is for total sum printouts.  Comment only one out before uploading the file.  Make sure that the RX/TX pins on the Arduino are disconnected from the XBee before running debug mode.
 
 **Library requirements**
 
