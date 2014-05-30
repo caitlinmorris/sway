@@ -9,10 +9,10 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-//#define DEBUG_MODE 0 // for individual sensor readouts
-#define DEBUG_MODE 1 // for composite sum readouts
+#define DEBUG_MODE 0 // for individual sensor readouts
+//#define DEBUG_MODE 1 // for composite sum readouts
 
-#define numMultiplexers 6
+#define numMultiplexers 1
 #define numChannels 8
 #define amountOfVariance 50 // how much the sensor ranges from "normal", adjust as necessary with testing
 
@@ -119,29 +119,6 @@ void loop () {
 
       analogIn = getValue(i,j);
 
-      // IMPLEMENT SMOOTHING LATER
-      /*
-      smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
-       readings[i][j][smoothIndex[i][j]] = analogIn;
-       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
-       smoothIndex[i][j] = smoothIndex[i][j] + 1;
-       
-       if(smoothIndex[i][j] > smoothSampleSize)
-       smoothIndex[i][j] = 0;
-       
-       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-       
-       if(smoothAvg[i][j] > sensorMax[i][j]){
-       displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,200,0,15);
-       displacement[i][j] = constrain(displacement[i][j],0,15);
-       }
-       else if(smoothAvg[i][j] < sensorMin[i][j]){
-       displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,200,0,15);
-       displacement[i][j] = constrain(displacement[i][j],0,15);
-       }
-       else displacement[i][j] = 0;
-       */
-
       if(analogIn > sensorMax[i][j]){
         if(DEBUG_MODE == 1){
           displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
@@ -171,13 +148,12 @@ void loop () {
       }
 
       else if (DEBUG_MODE == 0){
-        //        Serial.print(analogIn); // print actual values
+//        Serial.print(analogIn); // print actual values
         Serial.print(displacement[i][j]); // print unconstrained displacement values
         Serial.print(" ");
       }
     }
     if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;
-    else if (DEBUG_MODE == 0) Serial.println();
   }    
 
   if (DEBUG_MODE == 1){

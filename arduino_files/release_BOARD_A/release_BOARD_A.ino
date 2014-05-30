@@ -144,13 +144,15 @@ void loop () {
 
 //  xbee.send(zbTx);
   
-  for(int i = 0; i < numMultiplexers; i++){
-    Serial.print(payload[i] + " ");
+  for(int i=0; i < sizeof(payload); i++){
+      Serial.print(payload[i]);
+      Serial.print(" ");
   }
   Serial.println();
+  
   // currently leaving out response packet steps!
 
-  delay(50);
+  delay(60);
 }
 
 
