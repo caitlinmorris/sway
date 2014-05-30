@@ -53,17 +53,17 @@ void draw() {
   // graphics output
   
   for(int i = 0; i < 6; i++){ // ARDUINO A contains array positions 0, 1, 2, 3, 4, 5
-    float circleSizeA = map(combinedData[i], 0, 96, 0, 150);
+    float circleSizeA = map(combinedData[i], 0, 96, 0, 200);
     ellipse(100+(i*100), 100, circleSizeA, circleSizeA);
   }
   
   for(int i = 6; i < 13; i++){ // ARDUINO B contains array positions 6, 7, 8, 9, 10, 11, 12
-    float circleSizeB = map(combinedData[i], 0, 96, 0, 150);
+    float circleSizeB = map(combinedData[i], 0, 96, 0, 200);
     ellipse(100+((i-6)*100), 300, circleSizeB, circleSizeB);
   }
   
   for(int i = 13; i < numMultiplexers; i++){ // ARDUINO C contains array positions 13, 14, 15, 16, 17, 18
-    float circleSizeC = map(combinedData[i], 0, 96, 0, 150);
+    float circleSizeC = map(combinedData[i], 0, 96, 0, 200);
     ellipse(100+((i-14)*100), 500, circleSizeC, circleSizeC);
   }
 
