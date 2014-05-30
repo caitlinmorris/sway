@@ -9,12 +9,12 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-#define DEBUG_MODE 0 // for individual sensor readouts
-//#define DEBUG_MODE 1 // for composite sum readouts
+//#define DEBUG_MODE 0 // for individual sensor readouts
+#define DEBUG_MODE 1 // for composite sum readouts
 
 #define numMultiplexers 6
 #define numChannels 8
-#define amountOfVariance 100 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 50 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -142,7 +142,7 @@ void loop () {
        else displacement[i][j] = 0;
        */
 
-      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
+      if(analogIn > sensorMax[i][j]){
         if(DEBUG_MODE == 1){
           displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
           displacement[i][j] = constrain(displacement[i][j], 0, 15); 
@@ -166,8 +166,8 @@ void loop () {
 
       if( DEBUG_MODE == 1 ){
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
-        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
-        displacementSum[i] += analogIn;  
+//        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
+//        displacementSum[i] += analogIn;  
       }
 
       else if (DEBUG_MODE == 0){

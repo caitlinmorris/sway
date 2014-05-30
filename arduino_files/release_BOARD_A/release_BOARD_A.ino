@@ -114,8 +114,6 @@ void loop () {
 
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
-//    payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
-
     for(int j = 0; j < numChannels; j++){
 
       analogIn = getValue(i,j);
@@ -143,7 +141,7 @@ void loop () {
        */
 
       // map sensor down to 0-16 range so that with max 7 multiplexers the total sum will be within the 0-127 MIDI range
-      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
+      if(analogIn > sensorMax[i][j]){
         displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 16);
         displacement[i][j] = constrain(displacement[i][j], 0, 16); 
       }
