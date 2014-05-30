@@ -8,7 +8,7 @@ import processing.serial.*;
 Serial myPort; // the serial port you're using
 String portNum; // name of the serial port
 
-int packetByteLength = 21; // what determines size? for 9-piece payload should be 27?
+int packetByteLength = 26; // what determines size? for 9-piece payload should be 27?
 int startByte = 126; // a unique number that indicates the start of a new packet
 int packetIndex = 0;
 
@@ -23,10 +23,14 @@ String printVals = "";
 
 int [] inPacket = new int [packetByteLength]; // should be the size of whatever the expected packet is
 
+int inVal1 = 0;
+int inVal2 = 0;
+int inVal3 = 0;
+
 void setup() {
-  size(1200, 800);
+  size(400, 400);
   println(Serial.list());
-  portNum = Serial.list()[0];
+  portNum = Serial.list()[4];
   myPort = new Serial(this, portNum, 9600);
 }
 
@@ -34,11 +38,18 @@ void draw() {
 
   background(0);
 
+  text(millis(), 20, 20);
+  text(inVal1, 100, 100);
+  text(inVal2, 200, 100);
+  text(inVal3, 300, 100);
+
+  /*
   for (int i = 0; i < numMultiplexers; i++) {
-    for (int j = 0; j < numChannels; j++) {
-      ellipse(200+(j*150), 200+(i*150), circleSizes[i][j], circleSizes[i][j]);
-    }
-  }
+   for (int j = 0; j < numChannels; j++) {
+   ellipse(200+(j*150), 200+(i*150), circleSizes[i][j], circleSizes[i][j]);
+   }
+   }
+   */
 }
 
 void serialEvent(Serial myPort) {
@@ -69,25 +80,37 @@ void serialEvent(Serial myPort) {
       inPacket[packetIndex] = inByte;
       packetIndex++;
 
-      if (packetIndex == 18) {
-        multiplexerIndex = inByte;
+      if (packetIndex == 20) {
+        //        multiplexerIndex = inByte;
+        if (inPacket[11] == 167) {
+          inVal1 = inByte;
+          println("inVal1 = " + inVal1);
+        }
+
+        else if (inPacket[11] == 175) {
+          inVal2 = inByte;
+          println("inVal2 = " + inVal2);
+        }
+        
+        else if (inPacket[11] == 180) {
+          inVal3 = inByte;
+          println("inVal3 = " + inVal3);
+        }
+
+        else println("inpacket = " + inPacket[12]);
       }
 
-      if (packetIndex > 18) {
-        //    if (packetIndex == 17 || packetIndex == 18) {
-        printVals += packetIndex;
-        printVals += ": ";
-        printVals += inByte;
-        printVals += "   ";
+      printVals += packetIndex;
+      printVals += ": ";
+      printVals += inByte;
+      printVals += "   ";
 
-        circleSizes[multiplexerIndex][saveIndex] = inByte;
-        if (saveIndex < numChannels) saveIndex++;
-      }
+      //      }
     }
   }
 
   catch(Exception e) {
-    println("some kind of failure");
+    //    println("some kind of failure");
   }
 }
 
