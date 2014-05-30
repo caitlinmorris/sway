@@ -25,3 +25,17 @@ send all MIDI data to Live
 
 Hardware:
 lots of debugging
+
+assorted documentation
+====
+**Code Organization**
+
+In "arduino_files", folders starting with debug_BOARD_ use serial communication to print sensor data to the serial monitor in Arduino via USB.  Folders starting with release_BOARD_ communicate wirelessly to Processing via XBee.
+
+**Uploading to Arduino**
+
+To upload any firmware onto the Arduinos, first disconnect the RX/TX header pin group from the Arduino board, then upload, then reconnect RX/TX so that the RED line (coming from DOUT on XBee) is connected to RX 0.  IN and OUT onboard LEDs on the XBee shield should start blinking when connected to power.
+
+**Testing with dummy data**
+
+To test the basic XBee router / controller communication, there are three files for sending a series of false data in the folder "dummy_xbee_transmitters" nested under "code_tests_archive".  The files are the same except for the false values that they're sending.
