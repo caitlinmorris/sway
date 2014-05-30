@@ -144,11 +144,11 @@ void loop () {
 
       // map sensor down to 0-16 range so that with max 7 multiplexers the total sum will be within the 0-127 MIDI range
       if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
-        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, 200, 0, 16);
+        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 16);
         displacement[i][j] = constrain(displacement[i][j], 0, 16); 
       }
       else if (analogIn < sensorMin[i][j]){
-        displacement[i][j] = map(sensorMin[i][j], 0, 200, 0, 16);
+        displacement[i][j] = map(sensorMin[i][j], 0, amountOfVariance, 0, 16);
         displacement[i][j] = constrain(displacement[i][j], 0, 16);
       }
       else {

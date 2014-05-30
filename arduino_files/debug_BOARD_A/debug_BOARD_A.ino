@@ -10,26 +10,30 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 6
 #define numChannels 8
+#define amountOfVariance 100 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
 int analogOut = A0; // analog output pin; will change in getValue switch case
 
-const int smoothSampleSize = 10; // values to sample for smoothing
+uint8_t payload[] = { 0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
 
+/* CALIBRATION INITIALIZATION */
 int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
 int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
 int sensorMax [numMultiplexers][numChannels];   // maximum sensor value for calibration
 
-int multiplexers [numMultiplexers][numChannels];
-
+/* SMOOTHING INITIALIZATION */
+const int smoothSampleSize = 10; // values to sample for smoothing
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
 int smoothAvg [numMultiplexers][numChannels];
 int readings [numMultiplexers][numChannels][smoothSampleSize];
 
-int displacement [numMultiplexers][numChannels];
-int displacementSum [numMultiplexers];
+/* DISPLACEMENT INITIALIZATION */
+int displacement [numMultiplexers][numChannels]; // this is the difference-from-normal of each individual sensor
+int displacementSum [numMultiplexers]; // this is the total difference for each multiplexer
+// displacementSum is the value that gets sent via XBee
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -94,9 +98,6 @@ void loop () {
 
   for(int i = 0; i < numMultiplexers; i++){
 
-    //    Serial.print(i);
-    //    Serial.print(" ");
-
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
     for(int j = 0; j < numChannels; j++){
@@ -127,11 +128,11 @@ void loop () {
        */
 
       if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
-        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, 200, 0, 15);
+        displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
         displacement[i][j] = constrain(displacement[i][j], 0, 15); 
       }
       else if (analogIn < sensorMin[i][j]){
-        displacement[i][j] = map(sensorMin[i][j], 0, 200, 0, 15);
+        displacement[i][j] = map(sensorMin[i][j], 0, amountOfVariance, 0, 15);
         displacement[i][j] = constrain(displacement[i][j], 0, 15);
       }
       else {
@@ -142,12 +143,17 @@ void loop () {
       analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
       displacementSum[i] += analogIn;  
     }
-    Serial.print( displacementSum [i]);
-    Serial.print(" ");
+    payload[i] = displacementSum[i] & 0xff;
   }    
 
-  Serial.println();
-  delay(10);
+  for(int i=0; i < sizeof(payload); i++){
+    Serial.print(payload[i]);
+    Serial.print(" ");
+  }
+  
+  Serial.println(); // equivalent to xbee.send();
+
+  delay(50);
 }
 
 
