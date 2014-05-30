@@ -114,7 +114,7 @@ void loop () {
 
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
-    payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
+//    payload[0] = i & 0xff; // start each packet with the i value to indicate which multiplexer index we're in
 
     for(int j = 0; j < numChannels; j++){
 
