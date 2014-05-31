@@ -9,10 +9,10 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-#define DEBUG_MODE 0 // for individual sensor readouts
-//#define DEBUG_MODE 1 // for composite sum readouts
+//#define DEBUG_MODE 0 // for individual sensor readouts
+#define DEBUG_MODE 1 // for composite sum readouts
 
-#define numMultiplexers 1
+#define numMultiplexers 6
 #define numChannels 8
 #define amountOfVariance 50 // how much the sensor ranges from "normal", adjust as necessary with testing
 
@@ -79,7 +79,7 @@ void setup() {
   }
 
   // calibrate during the first five seconds 
-  while (millis() < 5000) {
+  while (millis() < 500) {
 
     for(int i = 0; i < numMultiplexers; i++){
       for(int j = 0; j < numChannels; j++){
@@ -148,8 +148,8 @@ void loop () {
       }
 
       else if (DEBUG_MODE == 0){
-//        Serial.print(analogIn); // print actual values
-        Serial.print(displacement[i][j]); // print unconstrained displacement values
+        Serial.print(analogIn); // print actual values
+//        Serial.print(displacement[i][j]); // print unconstrained displacement values
         Serial.print(" ");
       }
     }
