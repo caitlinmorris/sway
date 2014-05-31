@@ -14,35 +14,43 @@ import processing.serial.*;
 OscP5 oscP5;
 NetAddress remoteAddress;
 
-Serial myPortA, myPortB;                       // The serial port
-int[] serialInArrayA = new int[6];    // Where we'll put what we receive
-int[] serialInArrayB = new int[7];    // Where we'll put what we receive
+Serial port_A, port_B, port_C;
+int [] ardA_multiplexers = new int[6];  // Receive the displacement sum array from each arduino
+int [] ardB_multiplexers = new int[7];
+int [] ardC_multiplexers = new int[6]; 
 
-int serialCountA = 0;                 // A count of how many bytes we receive
-int serialCountB = 0;                 // A count of how many bytes we receive
+int ardA_index = 0;                 // A count of how many bytes we receive
+int ardB_index = 0;
+int ardC_index = 0;
 
-boolean firstContactA = false;         // Whether we've heard from the microcontroller
-boolean firstContactB = false;         // Whether we've heard from the microcontroller
-
+boolean ardA_contacted = false;         // Whether we've heard from the microcontroller
+boolean ardB_contacted = false;       
+boolean ardC_contacted = false;
 
 int numSoundGroups = 19;
-int combinedData[] = new int [numSoundGroups];
+int combinedData[] = new int [numSoundGroups]; // the full array set which will be sent to max
 
 void setup() {
   size(200, 200);
-  
+
   // Print a list of the serial ports, for debugging purposes:
   println(Serial.list());
 
-  String portNameA = "/dev/tty.usbmodem1411"; // RENAME
-  myPortA = new Serial(this, portNameA, 9600);
+  // to do: try this with the standard Serial.list()[0] index instead of specific names
+  // this was showing one of the ports as busy but it was 3 AM so maybe try again another time
 
-  String portNameB = "/dev/tty.usbmodem1421"; // RENAME
-  myPortB = new Serial(this, portNameB, 9600);
+  String portNameA = "/dev/tty.usbmodem1411"; // Arduino A USB port ID
+  port_A = new Serial(this, portNameA, 9600);
+
+  String portNameB = "/dev/tty.usbmodem1421"; // Arduino B USB port ID
+  port_A = new Serial(this, portNameB, 9600);
+
+  String portNameC = "/dev/tty.usbmodem141"; // Arduino C USB port ID
+  port_C = new Serial(this, portNameC, 9600);
 
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this, 12000);
-  remoteAddress = new NetAddress("10.45.34.21", 12000);
+  remoteAddress = new NetAddress("10.45.34.21", 12000); // UPDATE WITH IP ADDRESS OF REMOTE COMPUTER (OR CHANGE TO 192.0.0.1 FOR LOCAL)
 
   for (int i = 0; i < numSoundGroups; i++) {
     combinedData[i] = 0;
@@ -50,96 +58,115 @@ void setup() {
 }
 
 void draw() {
-
-  background(0);
-
 }
 
-void serialEvent(Serial myPort) {
+void serialEvent(Serial port) {
 
-  if (myPort == myPortA) {
+  if (port == port_A) {
     // read a byte from the serial port:
-    int inByteA = myPortA.read();
+    int inByte_A = port_A.read();
     // if this is the first byte received, and it's an A,
-    // clear the serial buffer and note that you've
-    // had first contact from the microcontroller. 
+    // clear the serial buffer and flip the "contact" boolean.
     // Otherwise, add the incoming byte to the array:
-    if (firstContactA == false) {
-      if (inByteA == 'A') { 
-        myPortA.clear();          // clear the serial port buffer
-        firstContactA = true;     // you've had first contact from the microcontroller
-        myPortA.write('A');       // ask for more
+    if (ardA_contacted == false) {
+      if (inByte_A == 'A') { 
+        port_A.clear();          // clear the serial port buffer
+        ardA_contacted = true;   // you've had first contact from the microcontroller
+        port_A.write('A');       // ask for more bytes from arduino
       }
     } 
     else {
-      // Add the latest byte from the serial port to array:
+      // after the first byte, just add the latest byte from the serial port to array:
 
-      serialInArrayA[serialCountA] = inByteA;
-      serialCountA++;
+      ardA_multiplexers[ardA_index] = inByte_A;
+      ardA_index++;
 
       // If we have all the bytes:
-      if (serialCountA > 5 ) {
+      if (ardA_index > 5 ) {
 
         for (int i = 0; i < 6; i++) {
-          combinedData[i] = serialInArrayA[i];
+          combinedData[i] = ardA_multiplexers[i]; // values 0,1,2,3,4,5 in final array
         }
 
-        sendMessage();
+        sendMessage(); // transmit the whole combinedData[] array over OSC
 
-        // Send a capital A to request new sensor readings:
-        myPortA.write('A');
-        // Reset serialCount:
-        serialCountA = 0;
+        // ask for more bytes from arduino
+        port_A.write('A');
+        // Reset byte index:
+        ardA_index = 0;
       }
     }
   }
 
-  else if (myPort == myPortB) {
-    // read a byte from the serial port:
-    int inByteB = myPortB.read();
+  else if (port == port_B) {
+    // all the same thing, just with the next port
+    int inByte_B = port_B.read();
 
-    if (firstContactB == false) {
-      if (inByteB == 'A') { 
-        myPortB.clear();          // clear the serial port buffer
-        firstContactB = true;     // you've had first contact from the microcontroller
-        myPortB.write('B');       // ask for more
+    if (ardB_contacted == false) {
+      if (inByte_B == 'A') { 
+        port_B.clear();      
+        ardB_contacted = true;  
+        port_B.write('A');
       }
     } 
     else {
-      // Add the latest byte from the serial port to array:
 
-      serialInArrayB[serialCountB] = inByteB;
-      serialCountB++;
+      ardB_multiplexers[ardB_index] = inByte_B;
+      ardB_index++;
 
-      // If we have all the bytes:
-      if (serialCountB > 6 ) {
-
+      if (ardB_index > 6 ) {
         for (int i = 0; i < 7; i++) {
-          combinedData[i+6] = serialInArrayB[i];
+          combinedData[i+6] = ardB_multiplexers[i]; // values 6, 7, 8, 9, 10, 11, 12 in final array
         }
 
         sendMessage();
 
-        // Send a capital A to request new sensor readings:
-        myPortB.write('A');
-        // Reset serialCount:
-        serialCountB = 0;
+        port_B.write('A');
+        ardB_index = 0;
+      }
+    }
+  }
+
+  else if (port == port_C) {
+    // all the same thing, just with the next port
+    int inByte_C = port_C.read();
+
+    if (ardC_contacted == false) {
+      if (inByte_C == 'A') { 
+        port_C.clear();      
+        ardC_contacted = true;  
+        port_C.write('A');
+      }
+    } 
+    else {
+
+      ardC_multiplexers[ardC_index] = inByte_C;
+      ardC_index++;
+
+      if (ardC_index > 6 ) {
+        for (int i = 0; i < 7; i++) {
+          combinedData[i+13] = ardC_multiplexers[i]; // values 13, 14, 15,16, 17, 18 in final array
+        }
+
+        sendMessage();
+
+        port_C.write('A');
+        ardC_index = 0;
       }
     }
   }
 }
 
 void sendMessage() {
-  OscMessage myMessage = new OscMessage("/test");
+  OscMessage message = new OscMessage("/test");
 
-  myMessage.add(combinedData);
+  message.add(combinedData);
 
-  oscP5.send(myMessage, remoteAddress);
+  oscP5.send(message, remoteAddress);
 
   for (int i = 0; i < numSoundGroups; i++) {
     print(combinedData[i] + " ");
   }
   println();
 }
-
 
