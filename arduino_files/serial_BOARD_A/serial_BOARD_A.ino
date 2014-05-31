@@ -27,6 +27,10 @@ int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor va
 int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
 int sensorMax [numMultiplexers][numChannels];   // maximum sensor value for calibration
 
+/* AUTO CALIBRATION VALUES */
+int timeNotMoving [numMultiplexers][numChannels];
+int recalibTime = 3000; // time after which the sensor will recalibrate, currently 3 seconds
+
 /* DISPLACEMENT INITIALIZATION */
 int displacement [numMultiplexers][numChannels]; // this is the difference-from-normal of each individual sensor
 int displacementSum [numMultiplexers]; // this is the total difference for each multiplexer
@@ -110,12 +114,12 @@ void loop()
       analogIn = getValue(i,j);
 
       if(analogIn > sensorMax[i][j]){
-          displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
+          displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 16); // map to 0-16 range so that the sum of 7 possible multiplexers is within the 0-127 MIDI range
           displacement[i][j] = constrain(displacement[i][j], 0, 15); 
 
       }
       else if (analogIn < sensorMin[i][j]){
-          displacement[i][j] = map(sensorMin[i][j]-analogIn, 0, amountOfVariance, 0, 15);
+          displacement[i][j] = map(sensorMin[i][j]-analogIn, 0, amountOfVariance, 0, 16);
           displacement[i][j] = constrain(displacement[i][j], 0, 15);
 
       }
@@ -124,8 +128,6 @@ void loop()
       }
 
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
-//        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
-//        displacementSum[i] += analogIn;  
       
     }
     payload[i] = displacementSum[i];
@@ -176,6 +178,24 @@ int getValue( int multiplexer, int channel) {
 
   }
   return analogRead(analogOut);
+}
+
+void autoCalibrate(){
+  // check for non-zero sensors
+  // start a timer on non-zero sensors
+  // set the initial value as a save value
+  // get difference from min and max of that value
+  // if there's no change for X time, saved value = new central calibration value
+  // set calibration value equal to (central value) + / - (calibration difference)/2
+  
+  for (int i = 0; i < numMultiplexers; i++){
+   for(int j = 0; j < numChannels; j++){
+    if(displacement[i][j] > 0){
+      timeNotMoving[i][j] = millis();
+      
+    }
+     
+  }
 }
 
 void establishContact() {
