@@ -19,7 +19,8 @@ void testApp::setup() {
     // we know that they are named in seq
     ofDirectory dir;
     
-    int nFiles = dir.listDir("plops");
+    int nFiles = dir.listDir("contours");
+    numFrames = nFiles;
     if(nFiles) {
         
         for(int i=0; i<dir.numFiles(); i++) { 
@@ -56,7 +57,7 @@ void testApp::draw() {
     
     // draw the image sequence at the new frame count
     ofSetColor(255);
-    images[sequenceIndex].draw(256, 36);
+    images[sequenceIndex].draw(0, 0);
     
 }
 
@@ -64,8 +65,9 @@ void testApp::draw() {
 void testApp::keyPressed(int key){
     
     
-    if(key == OF_KEY_LEFT)    sequenceIndex --;
-    if(key == OF_KEY_RIGHT)   sequenceIndex ++;
+    if(key == OF_KEY_LEFT && sequenceIndex > 0) sequenceIndex --;
+
+    if(key == OF_KEY_RIGHT && sequenceIndex < numFrames-1) sequenceIndex ++;
     
     // check for less than zero...
 }
