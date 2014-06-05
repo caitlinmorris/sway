@@ -34,6 +34,9 @@ void testApp::setup() {
         
     } 
     else printf("Could not find folder\n");
+    
+    topLine.loadImage("top.png");
+    topLinePos = 0;
 
     int sequenceIndex = 0;
     ofSetFrameRate(60);
@@ -59,6 +62,8 @@ void testApp::draw() {
     ofSetColor(255);
     images[sequenceIndex].draw(0, 0);
     
+    topLine.draw(0,topLinePos);
+    
 }
 
 //--------------------------------------------------------------
@@ -68,6 +73,12 @@ void testApp::keyPressed(int key){
     if(key == OF_KEY_LEFT && sequenceIndex > 0) sequenceIndex --;
 
     if(key == OF_KEY_RIGHT && sequenceIndex < numFrames-1) sequenceIndex ++;
+    
+    if(key == OF_KEY_UP) topLinePos--;
+    
+    if(key == OF_KEY_DOWN) topLinePos++;
+    
+    if(key == '0') topLinePos=0;
     
     // check for less than zero...
 }

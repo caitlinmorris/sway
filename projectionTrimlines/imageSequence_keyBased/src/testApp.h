@@ -20,6 +20,9 @@ public:
 //    bool  bFrameIndependent;
     vector <ofImage> images;
     
+    ofImage topLine;
+    int topLinePos;
+    
     int numFrames;
     
 };
