@@ -23,6 +23,10 @@ public:
     ofImage topLine;
     int topLinePos;
     
+    float globalRotate;
+    
+    int globalYPos;
+    
     int numFrames;
     
 };

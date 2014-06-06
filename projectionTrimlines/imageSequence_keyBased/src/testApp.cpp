@@ -37,6 +37,8 @@ void testApp::setup() {
     
     topLine.loadImage("top.png");
     topLinePos = 0;
+    
+    globalRotate = 0;
 
     int sequenceIndex = 0;
     ofSetFrameRate(60);
@@ -58,11 +60,21 @@ void testApp::draw() {
         return;
     }
     
+    ofPushMatrix();
+    
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+    
+    ofRotateZ(globalRotate);
+    
+    ofTranslate(0,globalYPos);
+    
     // draw the image sequence at the new frame count
     ofSetColor(255);
-    images[sequenceIndex].draw(0, 0);
+    images[sequenceIndex].draw(-ofGetWidth()/2, -ofGetHeight()/2);
     
-    topLine.draw(0,topLinePos);
+    topLine.draw(-ofGetWidth()/2,-ofGetHeight()/2 + topLinePos);
+    
+    ofPopMatrix();
     
 }
 
@@ -79,6 +91,14 @@ void testApp::keyPressed(int key){
     if(key == OF_KEY_DOWN) topLinePos++;
     
     if(key == '0') topLinePos=0;
+    
+    if(key == 'r') globalRotate-=0.3;
+    
+    if(key == 't') globalRotate+=0.3;
+    
+    if(key == 'u') globalYPos--;
+    
+    if(key == 'd') globalYPos++;
     
     // check for less than zero...
 }
