@@ -51,4 +51,15 @@ MODE 0 is for individual sensor printouts; MODE 1 is for total sum printouts.  C
 The Processing files in this repo are based on xbee-api : https://code.google.com/p/xbee-api/
 
 The Arduino files require the xbee-arduino library : https://code.google.com/p/xbee-arduino/
-    
+
+**Key controls for trimline projection adjustment**
+
+LEFT / RIGHT : step backward and forward through frames
+
+UP / DOWN: adjust top line ONLY (careful, this changes the relative height of the reed ends)
+
+0: reset top line position
+
+R / T : global rotate left / right
+
+U / D : global shift up / down
