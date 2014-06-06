@@ -20,4 +20,13 @@ public:
 //    bool  bFrameIndependent;
     vector <ofImage> images;
     
+    ofImage topLine;
+    int topLinePos;
+    
+    float globalRotate;
+    
+    int globalYPos;
+    
+    int numFrames;
+    
 };

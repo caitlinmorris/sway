@@ -19,7 +19,8 @@ void testApp::setup() {
     // we know that they are named in seq
     ofDirectory dir;
     
-    int nFiles = dir.listDir("plops");
+    int nFiles = dir.listDir("contours");
+    numFrames = nFiles;
     if(nFiles) {
         
         for(int i=0; i<dir.numFiles(); i++) { 
@@ -33,6 +34,11 @@ void testApp::setup() {
         
     } 
     else printf("Could not find folder\n");
+    
+    topLine.loadImage("top.png");
+    topLinePos = 0;
+    
+    globalRotate = 0;
 
     int sequenceIndex = 0;
     ofSetFrameRate(60);
@@ -54,9 +60,21 @@ void testApp::draw() {
         return;
     }
     
+    ofPushMatrix();
+    
+    ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+    
+    ofRotateZ(globalRotate);
+    
+    ofTranslate(0,globalYPos);
+    
     // draw the image sequence at the new frame count
     ofSetColor(255);
-    images[sequenceIndex].draw(256, 36);
+    images[sequenceIndex].draw(-ofGetWidth()/2, -ofGetHeight()/2);
+    
+    topLine.draw(-ofGetWidth()/2,-ofGetHeight()/2 + topLinePos);
+    
+    ofPopMatrix();
     
 }
 
@@ -64,8 +82,23 @@ void testApp::draw() {
 void testApp::keyPressed(int key){
     
     
-    if(key == OF_KEY_LEFT)    sequenceIndex --;
-    if(key == OF_KEY_RIGHT)   sequenceIndex ++;
+    if(key == OF_KEY_LEFT && sequenceIndex > 0) sequenceIndex --;
+
+    if(key == OF_KEY_RIGHT && sequenceIndex < numFrames-1) sequenceIndex ++;
+    
+    if(key == OF_KEY_UP) topLinePos--;
+    
+    if(key == OF_KEY_DOWN) topLinePos++;
+    
+    if(key == '0') topLinePos=0;
+    
+    if(key == 'r') globalRotate-=0.3;
+    
+    if(key == 't') globalRotate+=0.3;
+    
+    if(key == 'u') globalYPos--;
+    
+    if(key == 'd') globalYPos++;
     
     // check for less than zero...
 }
