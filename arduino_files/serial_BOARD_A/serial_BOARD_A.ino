@@ -1,7 +1,7 @@
 /*
 caitlin morris + lisa kori chung, may 2014
  
- DEBUG FILE USING SERIAL COMMUNICATION
+ RELEASE FILE USING SERIAL COMMUNICATION
  
  BOARD A (blocks A1 - C4) : 6 multiplexers
  multi_5 : 7 sensors
