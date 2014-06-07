@@ -16,6 +16,7 @@ caitlin morris + lisa kori chung, may 2014
 #define numChannels 8
 #define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
+#define recalibTime 3000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -32,7 +33,6 @@ int sensorDiffRange [numMultiplexers][numChannels]; // difference from minimum t
 
 /* AUTO CALIBRATION VALUES */
 int timeSensorTriggered [numMultiplexers][numChannels];
-int recalibTime = 3000; // time after which the sensor will recalibrate, currently 3 seconds
 boolean bIsZero [numMultiplexers][numChannels]; // is the sensor just starting to move? start the timer
 boolean bSensorTriggered[numMultiplexers][numChannels]; // did the sensor trigger?
 
