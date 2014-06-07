@@ -10,7 +10,7 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 6
 #define numChannels 8
-#define amountOfVariance 30 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 20 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 
 int analogIn = 0; // stores analog value
@@ -187,7 +187,7 @@ void autoCalibrate(){
   // get difference from min and max of that value
   // if there's no change for X time, saved value = new central calibration value
   // set calibration value equal to (central value) + / - (calibration difference)/2
-  
+  /*
   for (int i = 0; i < numMultiplexers; i++){
    for(int j = 0; j < numChannels; j++){
     if(displacement[i][j] > 0){
@@ -196,6 +196,7 @@ void autoCalibrate(){
     }
      
   }
+  */
 }
 
 void establishContact() {

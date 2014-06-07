@@ -9,12 +9,12 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-//#define DEBUG_MODE 0 // for individual sensor readouts
-#define DEBUG_MODE 1 // for composite sum readouts
+#define DEBUG_MODE 0 // for individual sensor readouts
+//#define DEBUG_MODE 1 // for composite sum readouts
 
 #define numMultiplexers 6
 #define numChannels 8
-#define amountOfVariance 50 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 20 // how much the sensor ranges from "normal", adjust as necessary with testing
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -79,7 +79,7 @@ void setup() {
   }
 
   // calibrate during the first five seconds 
-  while (millis() < 500) {
+  while (millis() < 5000) {
 
     for(int i = 0; i < numMultiplexers; i++){
       for(int j = 0; j < numChannels; j++){
@@ -97,7 +97,7 @@ void setup() {
       }
     }
   }
-  
+
   for(int i = 0; i < numMultiplexers; i++){
     Serial.print(i);
     Serial.println(": ");
@@ -119,7 +119,30 @@ void loop () {
 
       analogIn = getValue(i,j);
 
-      if(analogIn > sensorMax[i][j]){
+      // IMPLEMENT SMOOTHING LATER
+      /*
+      smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
+       readings[i][j][smoothIndex[i][j]] = analogIn;
+       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
+       smoothIndex[i][j] = smoothIndex[i][j] + 1;
+       
+       if(smoothIndex[i][j] > smoothSampleSize)
+       smoothIndex[i][j] = 0;
+       
+       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+       
+       if(smoothAvg[i][j] > sensorMax[i][j]){
+       displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else if(smoothAvg[i][j] < sensorMin[i][j]){
+       displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,200,0,15);
+       displacement[i][j] = constrain(displacement[i][j],0,15);
+       }
+       else displacement[i][j] = 0;
+       */
+
+      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
         if(DEBUG_MODE == 1){
           displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, 15);
           displacement[i][j] = constrain(displacement[i][j], 0, 15); 
@@ -143,17 +166,25 @@ void loop () {
 
       if( DEBUG_MODE == 1 ){
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
-//        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
-//        displacementSum[i] += analogIn;  
+        analogIn = map(smoothAvg[i][j], 0, 900, 0, 15);
+        displacementSum[i] += analogIn;  
       }
 
       else if (DEBUG_MODE == 0){
+        
         Serial.print(analogIn); // print actual values
-//        Serial.print(displacement[i][j]); // print unconstrained displacement values
         Serial.print(" ");
+        
+        /*
+        if(displacement[i][j] > 0){
+          Serial.print(displacement[i][j]); // print unconstrained displacement values
+          Serial.print(" ");
+        }
+        */
       }
     }
     if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;
+    else if (DEBUG_MODE == 0) Serial.println();
   }    
 
   if (DEBUG_MODE == 1){
@@ -162,7 +193,6 @@ void loop () {
       Serial.print(" ");
     }
   }
-
 
   Serial.println(); // equivalent to xbee.send();
 
@@ -174,6 +204,9 @@ int getValue( int multiplexer, int channel) {
   // set the selector pins HIGH and LOW to match the binary value of channel
 
     for(int bit = 0; bit < 3; bit++){
+
+    // there's something wrong here, maybe because multi_0 isn't actually reading as a String, but rather some other kind of array name..
+    //int pin = multiName[bit]; // the pin wired to the multiplexer select bit
 
     switch (multiplexer) {
     case 0:
@@ -210,6 +243,8 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
+
 
 
 
