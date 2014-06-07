@@ -9,8 +9,8 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-#define DEBUG_MODE 0 // for individual sensor readouts
-//#define DEBUG_MODE 1 // for composite sum readouts
+//#define DEBUG_MODE 0 // for individual sensor readouts
+#define DEBUG_MODE 1 // for composite sum readouts
 
 #define numMultiplexers 6
 #define numChannels 8
@@ -41,7 +41,7 @@ int displacement [numMultiplexers][numChannels]; // this is the difference-from-
 int displacementSum [numMultiplexers]; // this is the total difference for each multiplexer
 // displacementSum is the value that gets sent via XBee
 
-int nonZeroDivisor = 0; // add up the number of non zero values to divide by
+int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -116,107 +116,76 @@ void setup() {
 }
 
 void loop () {
+  
+  ///////////////////////////////////////////////////////////////////////
+  // first loop through and get each sensor value and smooth it
+  // also count the number of non-zero sensor values (i.e. working sensors
+  // we'll use this value to divide the total sum evenly in the next loop
+  ////////////////////////////////////////////////////////////////////////
 
   for(int i = 0; i < numMultiplexers; i++){
 
-    displacementSum[i] = 0; // reset displacement sum value of each multiplexer
-    nonZeroDivisor = 0; // reset division sum amount of each multiplexer
+    nonZeroDivisor[i] = 0; // reset division sum amount of each multiplexer
 
     for(int j = 0; j < numChannels; j++){
 
       analogIn = getValue(i,j);
 
-      /////////////////////////
-      //// SMOOTHED VERSION////
-      /////////////////////////
-
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
       readings[i][j][smoothIndex[i][j]] = analogIn;
       smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
       smoothIndex[i][j] = smoothIndex[i][j] + 1;
-      
-      // smoothing debugging stuff
-      /*
-      Serial.print(i);
-      Serial.print(" ");
-      Serial.print(j);
-      Serial.print(" : ");
-      Serial.println(smoothIndex[i][j]);
-      */
 
       if(smoothIndex[i][j] >= smoothSampleSize)
         smoothIndex[i][j] = 0;
 
       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
-      
-      if(smoothAvg[i][j] > 0) nonZeroDivisor++;
+
+      if(smoothAvg[i][j] > 0) nonZeroDivisor[i]++;
+
+    }
+  }
+  
+  ///////////////////////////////////////////////////////////////////////////////
+  // loop through again, calculate displacement of avg values from calib values
+  // map onto a range so that each multiplexer's sum is 125 (for midi compatibility)
+  //////////////////////////////////////////////////////////////////////////////
+
+  for(int i = 0; i < numMultiplexers; i++){
+
+    displacementSum[i] = 0; // reset displacement sum value of each multiplexer
+    
+    int mappedSumDivisor;
+    if(nonZeroDivisor[i] > 0){
+       mappedSumDivisor = 125/nonZeroDivisor[i];
+    }
+    else mappedSumDivisor = 0;
+
+    for(int j = 0; j < numChannels; j++){     
 
       if(smoothAvg[i][j] > sensorMax[i][j]){
-        displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,amountOfVariance,0,outgoingConstVal);
-        displacement[i][j] = constrain(displacement[i][j],0,outgoingConstVal);
+        displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,amountOfVariance,0,mappedSumDivisor);
+        displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
       }
       else if(smoothAvg[i][j] < sensorMin[i][j]){
-        displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,amountOfVariance,0,outgoingConstVal);
-        displacement[i][j] = constrain(displacement[i][j],0,outgoingConstVal);
+        displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,amountOfVariance,0,mappedSumDivisor);
+        displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
       }
       else displacement[i][j] = 0;
 
-      //////////////////////////
-      // NOT SMOOTHED VERSION //
-      //////////////////////////
-/*
-      
-      if(analogIn > sensorMax[i][j] > sensorMax[i][j]){
-       if(DEBUG_MODE == 1){
-       displacement[i][j] = map(analogIn - sensorMax[i][j], 0, amountOfVariance, 0, outgoingConstVal);
-       displacement[i][j] = constrain(displacement[i][j], 0, outgoingConstVal); 
-       }
-       else if(DEBUG_MODE == 0){
-       displacement[i][j] = analogIn - sensorMax[i][j];
-       }
-       }
-       else if (analogIn < sensorMin[i][j]){
-       if(DEBUG_MODE == 1){
-       displacement[i][j] = map(sensorMin[i][j]-analogIn, 0, amountOfVariance, 0, outgoingConstVal);
-       displacement[i][j] = constrain(displacement[i][j], 0, outgoingConstVal);
-       }
-       else if(DEBUG_MODE == 0){
-       displacement[i][j] = sensorMin[i][j] - analogIn;
-       }
-       }
-       else {
-       displacement[i][j] = 0;
-       }
- */
-       
-
-      /////////////////////////
-      ///// END VERSIONS /////
-      /////////////////////////
 
       if( DEBUG_MODE == 1 ){
 
         ///// for smoothed version only //////
-
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
-
-        ///// for non smoothed version only ////
-        /*
-        analogIn = map(smoothAvg[i][j], 0, 900, 0, outgoingConstVal);
-         displacementSum[i] += analogIn;  
-         */
 
       }
 
       else if (DEBUG_MODE == 0){
         /*
-        Serial.print(analogIn); // print actual values
-         Serial.print(" ");
-         */
-         /*
          Serial.print(smoothAvg[i][j]); // print smoothed values
          Serial.print(" ");
-         */ 
+         */
 
         if(displacement[i][j] > 0){
           Serial.print(displacement[i][j]); // print unconstrained displacement values
@@ -285,6 +254,7 @@ int getValue( int multiplexer, int channel) {
   }
   return analogRead(analogOut);
 }
+
 
 
 
