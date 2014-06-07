@@ -12,6 +12,7 @@ caitlin morris + lisa kori chung, may 2014
 #define numChannels 8
 #define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
+#define recalibTime 3000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -33,10 +34,12 @@ int readings [numMultiplexers][numChannels][smoothSampleSize];
 int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
 int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
 int sensorMax [numMultiplexers][numChannels];   // maximum sensor value for calibration
+int sensorDiffRange [numMultiplexers][numChannels]; // difference from minimum to maximum value
 
 /* AUTO CALIBRATION VALUES */
-int timeNotMoving [numMultiplexers][numChannels];
-int recalibTime = 3000; // time after which the sensor will recalibrate, currently 3 seconds
+int timeSensorTriggered [numMultiplexers][numChannels];
+boolean bIsZero [numMultiplexers][numChannels]; // is the sensor just starting to move? start the timer
+boolean bSensorTriggered[numMultiplexers][numChannels]; // did the sensor trigger?
 
 /* DISPLACEMENT INITIALIZATION */
 int displacement [numMultiplexers][numChannels]; // this is the difference-from-normal of each individual sensor
@@ -106,6 +109,8 @@ void setup()
         if (calibrationValue[i][j] < sensorMin[i][j]) {
           sensorMin[i][j] = calibrationValue[i][j];
         }
+        sensorDiffRange[i][j] = sensorMax[i][j] - sensorMin[i][j];
+
       }
     }
   }
@@ -183,7 +188,9 @@ void loop()
       Serial.write(payload[i]);
       delay(10);
     }
-    //    Serial.println();
+    
+    autoCalibrate();
+
   }
 }
 
@@ -226,6 +233,41 @@ int getValue( int multiplexer, int channel) {
 
   }
   return analogRead(analogOut);
+}
+
+void autoCalibrate(){
+
+  for (int i = 0; i < numMultiplexers; i++){
+    for(int j = 0; j < numChannels; j++){
+      if(displacement[i][j] > 0){
+        if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
+          timeSensorTriggered[i][j] = millis(); // start the timer
+          bSensorTriggered[i][j] = true;
+        }
+        else{
+          bIsZero[i][j] = false;
+        }
+      }
+
+      else if(displacement[i][j] == 0){
+        if(bIsZero[i][j] == false) bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+      }
+    }
+  }
+
+  for (int i = 0; i < numMultiplexers; i++){
+    for(int j = 0; j < numChannels; j++){
+
+      if(bSensorTriggered[i][j] == true){
+        if(millis() - timeSensorTriggered[i][j] > recalibTime){
+          sensorMax[i][j] = smoothAvg[i][j] + (sensorDiffRange[i][j] / 2);
+          sensorMin[i][j] = smoothAvg[i][j] - (sensorDiffRange[i][j] / 2);
+          bIsZero[i][j] = true;
+          bSensorTriggered[i][j] = false;
+        }
+      }
+    }
+  }
 }
 
 void establishContact() {
