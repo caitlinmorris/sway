@@ -120,6 +120,7 @@ void loop () {
   for(int i = 0; i < numMultiplexers; i++){
 
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
+    nonZeroDivisor = 0; // reset division sum amount of each multiplexer
 
     for(int j = 0; j < numChannels; j++){
 
@@ -147,6 +148,8 @@ void loop () {
         smoothIndex[i][j] = 0;
 
       smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
+      
+      if(smoothAvg[i][j] > 0) nonZeroDivisor++;
 
       if(smoothAvg[i][j] > sensorMax[i][j]){
         displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,amountOfVariance,0,outgoingConstVal);
