@@ -188,7 +188,7 @@ void loop()
       }
       payload[i] = displacementSum[i];
       Serial.write(payload[i]);
-      delay(10);
+      delay(5);
     }
     autoCalibrate();
 
