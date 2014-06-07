@@ -5,15 +5,6 @@ textural sound + architectural installation, by caitlin morris + lisa kori chung
 
 TODOS
 
-Arduino:
-implement calibration phase for finding normal variance range per sensor
-auto calibration -- if a non-zero reed is not changing for > 5 seconds, make that the new calibration value
-
-Processing:
-sum up total displacement for each zone into a single value
-arrange displacement values into array for sending to maxMSP
-communication with maxMSP
-
 maxMSP:
 parse OSC bundles into individual MIDI parameters
 include simple MIDI trigger when sensor zone becomes active
@@ -37,7 +28,10 @@ To upload any firmware onto the Arduinos, first disconnect the RX/TX header pin 
 
 To test the basic XBee router / controller communication, there are three files for sending a series of false data in the folder "dummy_xbee_transmitters" nested under "code_tests_archive".  The files are the same except for the false values that they're sending.
 
-**Working in Serial debug mode**
+**XBee versus Serial modes**
+In the Arduino files, there is a version for sending data from each Arduino via XBee and a version for sending via serial with USB cables.  Both work but the XBee transmission has significantly higher latency.  In XBee mode, the RX/TX pins on each Arduino should be connected to the XBees. In Serial mode, these pins should be disconnected.
+
+**Working in debug mode**
 
 Within each debug_BOARD_ file, you can debug print either each individual raw sensor reading, or debug print the sum of the total displacement (which precisely mimics the data that's sent via XBee in release mode).  Each debug file has a toggle at the start:
 
@@ -52,13 +46,15 @@ The Processing files in this repo are based on xbee-api : https://code.google.co
 
 The Arduino files require the xbee-arduino library : https://code.google.com/p/xbee-arduino/
 
-**Key controls for trimline projection adjustment**
+**Key controls for openFrameworks trim line projection adjustment**
+
+"projectionTrimlines" is an openFrameworks sketch which steps through slices of the entire room volume, for cutting the correct geometry into the volume of tubes.  That sketch can be calibrated with these key commands:
 
 LEFT / RIGHT : step backward and forward through frames
 
 UP / DOWN: adjust top line ONLY (careful, this changes the relative height of the reed ends)
 
-0: reset top line position
+0: reset top line position relative to reed ends
 
 R / T : global rotate left / right
 
