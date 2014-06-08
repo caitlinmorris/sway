@@ -47,7 +47,7 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 900; // slightly kludgy, matches up with max patch threshold of 10=active
-int lowThresh = 20;
+int lowThresh = 25;
 int highThresh = 100;
 
 const int multi_0[] = {
@@ -62,6 +62,8 @@ const int multi_4[] = {
   22,24,26};
 const int multi_5[] = {
   28,30,32};
+const int multi_6[] = {
+  34, 36, 38};
 
 void setup()
 {
@@ -78,6 +80,8 @@ void setup()
     pinMode(multi_3[bit], OUTPUT);
     pinMode(multi_4[bit], OUTPUT);
     pinMode(multi_5[bit], OUTPUT);
+    pinMode(multi_6[bit], OUTPUT);  
+
   }
 
   for(int i=0; i < numMultiplexers; i++){
@@ -234,6 +238,10 @@ int getValue( int multiplexer, int channel) {
     case 5:
       digitalPin = multi_5[bit];
       analogOut = A5;
+      break;
+   case 6:
+      digitalPin = multi_6[bit];
+      analogOut = A6;
       break;
     default:
       break;
