@@ -173,12 +173,6 @@ void sendMessage() {
 
   oscP5.send(myMessage, remoteAddress);
   
-  /*
-  for (int i = 0; i < numSoundGroups; i++) {
-    print(combinedData[i] + " ");
-  }
-  */
-  
   print("A ");
   for(int i=0; i < 6; i++){
     print(ardA_multiplexers[i] + " ");
