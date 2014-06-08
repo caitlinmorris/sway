@@ -203,14 +203,14 @@ void loop () {
       }
 
       else if (DEBUG_MODE == 0){
-        /*
+        
         
          Serial.print(smoothAvg[i][j]); // print smoothed values
          Serial.print(" ");
-         */
+         
+/*
 
-
-        if(displacement[i][j] > 20 && displacement[i][j] < 80){
+        if(displacement[i][j] > lowThresh && displacement[i][j] < highThresh){
           Serial.print(i);
           Serial.print(" ");
           Serial.print(j);
@@ -218,7 +218,7 @@ void loop () {
           Serial.print(displacement[i][j]); // print unconstrained displacement values
           Serial.println(" ");
         }
-
+*/
       }
     }
     if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;
@@ -232,7 +232,7 @@ void loop () {
     }
   }
 
-  //  Serial.println(); // equivalent to xbee.send();
+    Serial.println(); // equivalent to xbee.send();
 
   autoCalibrate();
 
@@ -293,9 +293,9 @@ void autoCalibrate(){
 
   for (int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
-      if(displacement[i][j] > 20){
+      if(displacement[i][j] > lowThresh){
         if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
-          Serial.println("TRIGGER START GOOOOOOOOOO");
+     //     Serial.println("TRIGGER START GOOOOOOOOOO");
           timeSensorTriggered[i][j] = millis(); // start the timer
           bSensorTriggered[i][j] = true;
         }
@@ -304,10 +304,10 @@ void autoCalibrate(){
         }
       }
 
-      else if(displacement[i][j] == 0){
+      else if(displacement[i][j] < lowThresh/2){
         if(bIsZero[i][j] == false){
           bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
-          Serial.println("returned to zero naturally"); 
+         // Serial.println("returned to zero naturally"); 
         } 
       }
     }
@@ -318,7 +318,7 @@ void autoCalibrate(){
 
       if(bSensorTriggered[i][j] == true){
         if(millis() - timeSensorTriggered[i][j] > recalibTime){
-          Serial.println("TIMEOUT");
+         // Serial.println("TIMEOUT");
           sensorMax[i][j] = smoothAvg[i][j] + (sensorDiffRange[i][j] / 2);
           sensorMin[i][j] = smoothAvg[i][j] - (sensorDiffRange[i][j] / 2);
           bIsZero[i][j] = true;
