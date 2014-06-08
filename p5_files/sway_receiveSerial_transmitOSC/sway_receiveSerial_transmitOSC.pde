@@ -82,10 +82,10 @@ void serialEvent(Serial myPort) {
     else {
       // Add the latest byte from the serial port to array:
 
-      if (inByteA != 25) {
+//      if (inByteA != 20) {
         ardA_multiplexers[ardA_index] = inByteA * scaleFactor;
-      }
-      else ardA_multiplexers[ardA_index] = 0;
+//      }
+//      else ardA_multiplexers[ardA_index] = 0;
       ardA_index++;
 
       // If we have all the bytes:
@@ -118,10 +118,10 @@ void serialEvent(Serial myPort) {
     } 
     else {
       // Add the latest byte from the serial port to array:
-      if (inByteB != 25) {
+//      if (inByteB != 25) {
         ardB_multiplexers[ardB_index] = inByteB * scaleFactor;
-      }
-      else ardB_multiplexers[ardB_index] = 0;
+//      }
+//      else ardB_multiplexers[ardB_index] = 0;
       ardB_index++;
 
       // If we have all the bytes:
@@ -154,7 +154,7 @@ void serialEvent(Serial myPort) {
     } 
     else {
       // Add the latest byte from the serial port to array:
-      if (inByteC != 25) {
+      if (inByteC != 20) {
         ardC_multiplexers[ardC_index] = inByteC * scaleFactor;
       }
       else ardC_multiplexers[ardC_index] = 0;
