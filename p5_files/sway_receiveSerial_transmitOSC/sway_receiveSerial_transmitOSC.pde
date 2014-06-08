@@ -19,6 +19,8 @@ int [] ardA_multiplexers = new int[6];  // Receive the displacement sum array fr
 int [] ardB_multiplexers = new int[7];
 int [] ardC_multiplexers = new int[6]; 
 
+int scaleFactor = 1;
+
 int ardA_index = 0;                 // A count of how many bytes we receive
 int ardB_index = 0;
 int ardC_index = 0;
@@ -36,10 +38,10 @@ void setup() {
   // Print a list of the serial ports, for debugging purposes:
   println(Serial.list());
 
-  String portNameA = "/dev/tty.usbmodem141141"; // RENAME
+  String portNameA = "/dev/tty.usbmodem141141"; // Arduino A USB port ID
   port_A = new Serial(this, portNameA, 9600);
 
-  String portNameB = "/dev/cu.usbmodem141241"; // RENAME
+  String portNameB = "/dev/cu.usbmodem141241"; // Arduino B USB port ID
   port_B = new Serial(this, portNameB, 9600);
 
   String portNameC = "/dev/tty.usbmodem141341"; // Arduino C USB port ID
@@ -47,7 +49,11 @@ void setup() {
 
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this, 12000);
-  remoteAddress = new NetAddress("10.45.34.21", 12000);
+  remoteAddress = new NetAddress("10.45.34.21", 12000); // lisa
+  //  remoteAddress = new NetAddress("10.45.35.226", 12000); // davide
+  //remoteAddress = new NetAddress("127.0.0.1", 12000); // local
+
+
 
   for (int i = 0; i < numSoundGroups; i++) {
     combinedData[i] = 0;
@@ -76,7 +82,10 @@ void serialEvent(Serial myPort) {
     else {
       // Add the latest byte from the serial port to array:
 
-      ardA_multiplexers[ardA_index] = inByteA;
+      if (inByteA != 25) {
+        ardA_multiplexers[ardA_index] = inByteA * scaleFactor;
+      }
+      else ardA_multiplexers[ardA_index] = 0;
       ardA_index++;
 
       // If we have all the bytes:
@@ -109,8 +118,10 @@ void serialEvent(Serial myPort) {
     } 
     else {
       // Add the latest byte from the serial port to array:
-
-      ardB_multiplexers[ardB_index] = inByteB;
+      if (inByteB != 25) {
+        ardB_multiplexers[ardB_index] = inByteB * scaleFactor;
+      }
+      else ardB_multiplexers[ardB_index] = 0;
       ardB_index++;
 
       // If we have all the bytes:
@@ -129,8 +140,8 @@ void serialEvent(Serial myPort) {
       }
     }
   }
-  
-    else if (myPort == port_C) {
+
+  else if (myPort == port_C) {
     // read a byte from the serial port:
     int inByteC = port_C.read();
 
@@ -143,8 +154,10 @@ void serialEvent(Serial myPort) {
     } 
     else {
       // Add the latest byte from the serial port to array:
-
-      ardC_multiplexers[ardC_index] = inByteC;
+      if (inByteC != 25) {
+        ardC_multiplexers[ardC_index] = inByteC * scaleFactor;
+      }
+      else ardC_multiplexers[ardC_index] = 0;
       ardC_index++;
 
       // If we have all the bytes:
@@ -163,7 +176,6 @@ void serialEvent(Serial myPort) {
       }
     }
   }
-  
 }
 
 void sendMessage() {
@@ -172,27 +184,26 @@ void sendMessage() {
   myMessage.add(combinedData);
 
   oscP5.send(myMessage, remoteAddress);
-  
+
   print("A ");
-  for(int i=0; i < 6; i++){
+  for (int i=0; i < 6; i++) {
     print(ardA_multiplexers[i] + " ");
   }
-  
+
   print("    ");
   print("B ");
-  
-  for(int i=0; i < 7; i++){
+
+  for (int i=0; i < 7; i++) {
     print(ardB_multiplexers[i] + " ");
   }
-  
+
   print("    ");
   print("C ");
-  
-  for(int i=0; i < 6; i++){
+
+  for (int i=0; i < 6; i++) {
     print(ardC_multiplexers[i] + " ");
   }
-  
+
   println();
-  
 }
 
