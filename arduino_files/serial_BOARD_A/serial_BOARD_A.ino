@@ -20,7 +20,7 @@ int analogOut = A0; // analog output pin; will change in getValue switch case
 int inByte = 0;         // incoming serial byte
 
 uint8_t payload[] = { 
-  0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
+  0, 0, 0, 0, 0, 0 }; // payload is 6, the max number of multiplexers across all arduinos
 
 /* SMOOTHING INITIALIZATION */
 const int smoothSampleSize = 5; // values to sample for smoothing
@@ -47,6 +47,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 1000;
+int lowThresh = 20;
+int highThresh = 100;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -65,9 +67,6 @@ void setup()
 {
   // start serial port at 9600 bps:
   Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for Leonardo only
-  }
 
   for(int bit = 0; bit < 3; bit++){
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
@@ -141,6 +140,10 @@ void loop()
 
         analogIn = getValue(i,j);
 
+        if(analogIn > 1000){
+          analogIn = 0;
+        }
+
         smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
         readings[i][j][smoothIndex[i][j]] = analogIn;
         smoothTotal[i][j] = smoothTotal[i][j] + readings[i][j][smoothIndex[i][j]];
@@ -171,24 +174,24 @@ void loop()
       }
       else mappedSumDivisor = 0;
 
-      for(int j = 0; j < numChannels; j++){     
+      for(int j = 0; j < numChannels; j++){
 
-        if(smoothAvg[i][j] > sensorMax[i][j]){
-          displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,amountOfVariance,0,mappedSumDivisor);
-          displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
-        }
-        else if(smoothAvg[i][j] < sensorMin[i][j]){
-          displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,amountOfVariance,0,mappedSumDivisor);
-          displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
-        }
-        else displacement[i][j] = 0;
+          if(smoothAvg[i][j] > sensorMax[i][j]){
+            displacement[i][j] = map((smoothAvg[i][j] - sensorMax[i][j]),0,amountOfVariance,0,mappedSumDivisor);
+            displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
+          }
+          else if(smoothAvg[i][j] < sensorMin[i][j]){
+            displacement[i][j] = map((sensorMin[i][j] - smoothAvg[i][j]),0,amountOfVariance,0,mappedSumDivisor);
+            displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
+          }
+          else displacement[i][j] = 0;
+          
+        if(displacement[i][j] > highThresh || displacement[i][j] < lowThresh) displacement[i][j] = 0;
 
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
 
       }
       payload[i] = displacementSum[i];
-      //      Serial.write(payload[i]);
-      //      delay(10);
     }
 
     for(int i=0; i < sizeof(payload); i++){
@@ -198,7 +201,7 @@ void loop()
     autoCalibrate();
 
   }
-  
+
   delay(5);
 
 }
@@ -248,7 +251,7 @@ void autoCalibrate(){
 
   for (int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
-      if(displacement[i][j] > 0){
+      if(displacement[i][j] > lowThresh){
         if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
           timeSensorTriggered[i][j] = millis(); // start the timer
           bSensorTriggered[i][j] = true;
@@ -258,8 +261,10 @@ void autoCalibrate(){
         }
       }
 
-      else if(displacement[i][j] == 0){
-        if(bIsZero[i][j] == false) bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+      else if(displacement[i][j] < lowThresh/2){
+        if(bIsZero[i][j] == false){
+          bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+        } 
       }
     }
   }

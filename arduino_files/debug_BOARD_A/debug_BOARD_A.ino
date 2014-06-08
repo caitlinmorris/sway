@@ -9,14 +9,14 @@ caitlin morris + lisa kori chung, may 2014
  */
 
 // SELECT DEBUG MODE HERE
-//#define DEBUG_MODE 0 // for individual sensor readouts
-#define DEBUG_MODE 1 // for composite sum readouts
+#define DEBUG_MODE 0 // for individual sensor readouts
+//#define DEBUG_MODE 1 // for composite sum readouts
 
 #define numMultiplexers 6
 #define numChannels 8
 #define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
-#define recalibTime 3000 // time after which the sensor will recalibrate, currently 3 seconds
+#define recalibTime 1000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -49,6 +49,7 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 // displacementSum is the value that gets sent via XBee
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
+int sumTotal = 1000;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -141,6 +142,8 @@ void loop () {
     for(int j = 0; j < numChannels; j++){
 
       analogIn = getValue(i,j);
+      
+      if(analogIn > 1000) analogIn = 0;
 
       smoothTotal[i][j] = smoothTotal[i][j] - readings[i][j][smoothIndex[i][j]];
       readings[i][j][smoothIndex[i][j]] = analogIn;
@@ -167,8 +170,12 @@ void loop () {
     displacementSum[i] = 0; // reset displacement sum value of each multiplexer
 
     int mappedSumDivisor;
+   /* Serial.print(i);
+    Serial.print(" ");
+    Serial.println(nonZeroDivisor[i]);
+    */
     if(nonZeroDivisor[i] > 0){
-      mappedSumDivisor = 125/nonZeroDivisor[i];
+      mappedSumDivisor = sumTotal/nonZeroDivisor[i];
     }
     else mappedSumDivisor = 0;
 
@@ -193,16 +200,22 @@ void loop () {
       }
 
       else if (DEBUG_MODE == 0){
-        /*
+        
+        
          Serial.print(smoothAvg[i][j]); // print smoothed values
          Serial.print(" ");
-         */
-
-        if(displacement[i][j] > 0){
-          Serial.print(displacement[i][j]); // print unconstrained displacement values
+         
+         
+/*
+        if(displacement[i][j] > 1 && displacement[i][j] < 50){
+          Serial.print(i);
           Serial.print(" ");
+          Serial.print(j);
+          Serial.print(" ");
+          Serial.print(displacement[i][j]); // print unconstrained displacement values
+          Serial.println(" ");
         }
-
+*/
       }
     }
     if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;

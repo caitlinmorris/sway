@@ -10,7 +10,7 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 7
 #define numChannels 8
-#define amountOfVariance 8 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 10 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define recalibTime 2000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
@@ -46,7 +46,9 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 // displacementSum is the value that gets sent via XBee
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
-int sumTotal = 1000;
+int sumTotal = 900; // slightly kludgy, matches up with max patch threshold of 10=active
+int lowThresh = 20;
+int highThresh = 100;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -165,7 +167,7 @@ void loop()
 
       int mappedSumDivisor;
       if(nonZeroDivisor[i] > 0){
-        mappedSumDivisor = 1250/nonZeroDivisor[i];
+        mappedSumDivisor = sumTotal/nonZeroDivisor[i];
       }
       else mappedSumDivisor = 0;
 
@@ -180,6 +182,8 @@ void loop()
           displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
         }
         else displacement[i][j] = 0;
+        
+        if(displacement[i][j] > highThresh || displacement[i][j] < lowThresh) displacement[i][j] = 0;
 
         displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
 
@@ -246,7 +250,7 @@ void autoCalibrate(){
 
   for (int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
-      if(displacement[i][j] > 0){
+      if(displacement[i][j] > lowThresh){
         if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
           timeSensorTriggered[i][j] = millis(); // start the timer
           bSensorTriggered[i][j] = true;
@@ -256,8 +260,10 @@ void autoCalibrate(){
         }
       }
 
-      else if(displacement[i][j] == 0){
-        if(bIsZero[i][j] == false) bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+      else if(displacement[i][j] < lowThresh/2){
+        if(bIsZero[i][j] == false){
+          bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+        } 
       }
     }
   }
