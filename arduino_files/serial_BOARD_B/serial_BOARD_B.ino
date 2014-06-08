@@ -10,9 +10,8 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 7
 #define numChannels 8
-#define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
-#define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
-#define recalibTime 3000 // time after which the sensor will recalibrate, currently 3 seconds
+#define amountOfVariance 8 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define recalibTime 2000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -47,6 +46,7 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 // displacementSum is the value that gets sent via XBee
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
+int sumTotal = 1000;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -165,7 +165,7 @@ void loop()
 
       int mappedSumDivisor;
       if(nonZeroDivisor[i] > 0){
-        mappedSumDivisor = 125/nonZeroDivisor[i];
+        mappedSumDivisor = 1250/nonZeroDivisor[i];
       }
       else mappedSumDivisor = 0;
 
@@ -185,13 +185,20 @@ void loop()
 
       }
       payload[i] = displacementSum[i];
+      //      Serial.write(payload[i]);
+      //      delay(10);
+    }
+
+    for(int i=0; i < sizeof(payload); i++){
       Serial.write(payload[i]);
       delay(10);
     }
-    
     autoCalibrate();
 
   }
+  
+  delay(5);
+
 }
 
 int getValue( int multiplexer, int channel) {

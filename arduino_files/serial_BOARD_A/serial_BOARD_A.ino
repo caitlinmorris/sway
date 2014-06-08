@@ -10,9 +10,8 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 6
 #define numChannels 8
-#define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
-#define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
-#define recalibTime 3000 // time after which the sensor will recalibrate, currently 3 seconds
+#define amountOfVariance 10 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define recalibTime 2000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low
@@ -21,10 +20,10 @@ int analogOut = A0; // analog output pin; will change in getValue switch case
 int inByte = 0;         // incoming serial byte
 
 uint8_t payload[] = { 
-  0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
+  0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
 
 /* SMOOTHING INITIALIZATION */
-const int smoothSampleSize = 10; // values to sample for smoothing
+const int smoothSampleSize = 5; // values to sample for smoothing
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
 int smoothAvg [numMultiplexers][numChannels];
@@ -47,6 +46,7 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 // displacementSum is the value that gets sent via XBee
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
+int sumTotal = 1000;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -167,7 +167,7 @@ void loop()
 
       int mappedSumDivisor;
       if(nonZeroDivisor[i] > 0){
-        mappedSumDivisor = 125/nonZeroDivisor[i];
+        mappedSumDivisor = sumTotal/nonZeroDivisor[i];
       }
       else mappedSumDivisor = 0;
 
@@ -187,12 +187,19 @@ void loop()
 
       }
       payload[i] = displacementSum[i];
+      //      Serial.write(payload[i]);
+      //      delay(10);
+    }
+
+    for(int i=0; i < sizeof(payload); i++){
       Serial.write(payload[i]);
-      delay(5);
+      delay(10);
     }
     autoCalibrate();
 
   }
+  
+  delay(5);
 
 }
 
@@ -279,6 +286,7 @@ void establishContact() {
     delay(300);
   }
 }
+
 
 
 
