@@ -3,8 +3,8 @@ caitlin morris + lisa kori chung, may 2014
  
  DEBUG FILE USING SERIAL COMMUNICATION
  
- BOARD A (blocks A1 - C4) : 6 multiplexers
- multi_5 : 7 sensors
+ BOARD B (blocks A1 - C4) : 6 multiplexers
+ multi_0 : 4 sensors (not working)
  
  */
 
@@ -21,14 +21,14 @@ int inByte = 0;         // incoming serial byte
 
 uint8_t payload[] = { 
   0, 0, 0, 0, 0, 0, 0 }; // payload is 7, the max number of multiplexers across all arduinos
-  
+
 /* SMOOTHING INITIALIZATION */
 const int smoothSampleSize = 10; // values to sample for smoothing
 int smoothIndex [numMultiplexers][numChannels];
 int smoothTotal [numMultiplexers][numChannels];
 int smoothAvg [numMultiplexers][numChannels];
 int readings [numMultiplexers][numChannels][smoothSampleSize];
-  
+
 /* CALIBRATION INITIALIZATION */
 int calibrationValue [numMultiplexers][numChannels]; // store incoming sensor values during calibration phase
 int sensorMin [numMultiplexers][numChannels]; // minimum sensor value for calibration
@@ -47,8 +47,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 900; // slightly kludgy, matches up with max patch threshold of 10=active
-int lowThresh = 25;
-int highThresh = 100;
+int lowThresh = 20;
+int highThresh = 70;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -72,8 +72,8 @@ void setup()
   while (!Serial) {
     ; // wait for serial port to connect. Needed for Leonardo only
   }
-  
-    for(int bit = 0; bit < 3; bit++){
+
+  for(int bit = 0; bit < 3; bit++){
     pinMode(multi_0[bit], OUTPUT); // set the three select pins to output
     pinMode(multi_1[bit], OUTPUT);
     pinMode(multi_2[bit], OUTPUT);
@@ -98,8 +98,8 @@ void setup()
     }
     displacementSum[i] = 0;
   }
-  
-    // calibrate during the first 2 seconds 
+
+  // calibrate during the first 2 seconds 
   while (millis() < 2000) {
 
     for(int i = 0; i < numMultiplexers; i++){
@@ -155,7 +155,19 @@ void loop()
 
         smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
 
-        if(smoothAvg[i][j] > 0) nonZeroDivisor[i]++;
+
+        if(i != 1){
+          if(smoothAvg[i][j] > 0)  nonZeroDivisor[i]++;
+        }
+
+        else if( i == 1) {
+          if(j == 0 || j==2 || j==6 || j==7){ //gross, but these are staying in zone m_1 now
+            if(smoothAvg[i][j] > 0) nonZeroDivisor[1]++;
+          }
+          else if(j == 1 || j==3 | j==4 || j==5) { //put these into pseudo-zone-m0
+            if(smoothAvg[i][j] > 0) nonZeroDivisor[0]++; // put these in what should be zone 0
+          }
+        }
 
       }
     }
@@ -186,16 +198,35 @@ void loop()
           displacement[i][j] = constrain(displacement[i][j],0,mappedSumDivisor);
         }
         else displacement[i][j] = 0;
-        
+
         if(displacement[i][j] > highThresh || displacement[i][j] < lowThresh) displacement[i][j] = 0;
 
-        displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
-
+        if(i > 1){ // because multiplexer 0 isn't working so we're wrapping half of m_1 into zone m_0
+          displacementSum[i] += displacement[i][j]; // add each individual sensor displacement to multiplexer sum
+        }
       }
       payload[i] = displacementSum[i];
-      //      Serial.write(payload[i]);
-      //      delay(10);
     }
+    
+        ////////////////////////////////////
+        // kludgy bit because m_0 burned out
+        ////////////////////////////////////   
+
+    for(int j = 0; j < numChannels; j++){
+      if(j == 0 || j==2 || j==6 || j==7) { //gross, but these are staying in zone m_1 now
+        displacementSum[1] += displacement[1][j];
+      }
+      else if(j == 1 || j==3 | j==4 || j==5) { //put these into pseudo-zone-m0
+        displacementSum[0] += displacement[1][j]; // put these in what should be zone 0
+      }
+    }
+    
+    payload[0] = displacementSum[0];
+    payload[1] = displacementSum[1];
+    
+        ////////////////////////////////////
+        // end kludgy bit
+        ////////////////////////////////////
 
     for(int i=0; i < sizeof(payload); i++){
       Serial.write(payload[i]);
@@ -204,7 +235,7 @@ void loop()
     autoCalibrate();
 
   }
-  
+
   delay(5);
 
 }
@@ -239,7 +270,7 @@ int getValue( int multiplexer, int channel) {
       digitalPin = multi_5[bit];
       analogOut = A5;
       break;
-   case 6:
+    case 6:
       digitalPin = multi_6[bit];
       analogOut = A6;
       break;
@@ -297,6 +328,11 @@ void establishContact() {
     delay(300);
   }
 }
+
+
+
+
+
 
 
 
