@@ -11,7 +11,7 @@ caitlin morris + lisa kori chung, may 2014
 #define numMultiplexers 6
 #define numChannels 8
 #define amountOfVariance 10 // how much the sensor ranges from "normal", adjust as necessary with testing
-#define recalibTime 2000 // time after which the sensor will recalibrate, currently 3 seconds
+#define recalibTime 1000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
 int digitalPin = 0; // digital pin to switch high or low

@@ -290,7 +290,7 @@ void autoCalibrate(){
     for(int j = 0; j < numChannels; j++){
       if(displacement[i][j] > lowThresh){
         if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
-          Serial.println("TRIGGER START GOOOOOOOOOO");
+//          Serial.println("TRIGGER START GOOOOOOOOOO");
           timeSensorTriggered[i][j] = millis(); // start the timer
           bSensorTriggered[i][j] = true;
         }
@@ -302,7 +302,7 @@ void autoCalibrate(){
       else if(displacement[i][j] < lowThresh/2){
         if(bIsZero[i][j] == false){
           bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
-          Serial.println("returned to zero naturally"); 
+//          Serial.println("returned to zero naturally"); 
         } 
       }
     }
@@ -313,7 +313,7 @@ void autoCalibrate(){
 
       if(bSensorTriggered[i][j] == true){
         if(millis() - timeSensorTriggered[i][j] > recalibTime){
-          Serial.println("TIMEOUT");
+//          Serial.println("TIMEOUT");
           sensorMax[i][j] = smoothAvg[i][j] + (sensorDiffRange[i][j] / 2);
           sensorMin[i][j] = smoothAvg[i][j] - (sensorDiffRange[i][j] / 2);
           bIsZero[i][j] = true;
