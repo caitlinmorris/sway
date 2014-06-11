@@ -7,9 +7,9 @@
 			"revision" : 9
 		}
 ,
-		"rect" : [ 20.0, 44.0, 1347.0, 698.0 ],
+		"rect" : [ 20.0, 44.0, 1247.0, 675.0 ],
 		"bglocked" : 0,
-		"defrect" : [ 20.0, 44.0, 1347.0, 698.0 ],
+		"defrect" : [ 20.0, 44.0, 1247.0, 675.0 ],
 		"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -11194,9 +11194,9 @@
 							"revision" : 9
 						}
 ,
-						"rect" : [ -31.0, 44.0, 1397.0, 671.0 ],
+						"rect" : [ 35.0, 44.0, 1397.0, 671.0 ],
 						"bglocked" : 0,
-						"defrect" : [ -31.0, 44.0, 1397.0, 671.0 ],
+						"defrect" : [ 35.0, 44.0, 1397.0, 671.0 ],
 						"openrect" : [ 0.0, 0.0, 0.0, 0.0 ],
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -13225,7 +13225,76 @@
 										"enablehscroll" : 1,
 										"enablevscroll" : 1,
 										"devicewidth" : 0.0,
+										"visible" : 1,
 										"boxes" : [ 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "s toff16",
+													"fontsize" : 12.0,
+													"id" : "obj-13",
+													"patching_rect" : [ 225.0, 555.0, 50.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 0
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "s ton16",
+													"fontsize" : 12.0,
+													"id" : "obj-12",
+													"patching_rect" : [ 180.0, 555.0, 50.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 0
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "sel 1 0",
+													"fontsize" : 12.0,
+													"id" : "obj-10",
+													"patching_rect" : [ 180.0, 510.0, 46.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 3,
+													"outlettype" : [ "bang", "bang", "" ]
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "change",
+													"fontsize" : 12.0,
+													"id" : "obj-8",
+													"patching_rect" : [ 180.0, 480.0, 50.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 3,
+													"outlettype" : [ "", "int", "int" ]
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "> 1",
+													"fontsize" : 12.0,
+													"id" : "obj-1",
+													"patching_rect" : [ 180.0, 450.0, 32.5, 20.0 ],
+													"numinlets" : 2,
+													"fontname" : "Arial",
+													"numoutlets" : 1,
+													"outlettype" : [ "int" ]
+												}
+
+											}
+, 											{
 												"box" : 												{
 													"maxclass" : "comment",
 													"text" : "<-- ramp scaled to float, send alpha value to change RGBA of sensor zone ",
@@ -13626,6 +13695,51 @@
 											}
  ],
 										"lines" : [ 											{
+												"patchline" : 												{
+													"source" : [ "obj-10", 1 ],
+													"destination" : [ "obj-13", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-10", 0 ],
+													"destination" : [ "obj-12", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-93", 0 ],
+													"destination" : [ "obj-1", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-1", 0 ],
+													"destination" : [ "obj-8", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-8", 0 ],
+													"destination" : [ "obj-10", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
 												"patchline" : 												{
 													"source" : [ "obj-120", 0 ],
 													"destination" : [ "obj-121", 0 ],
@@ -20476,6 +20590,74 @@
 										"devicewidth" : 0.0,
 										"boxes" : [ 											{
 												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "s toff5",
+													"fontsize" : 12.0,
+													"id" : "obj-13",
+													"patching_rect" : [ 225.0, 555.0, 43.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 0
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "s ton5",
+													"fontsize" : 12.0,
+													"id" : "obj-12",
+													"patching_rect" : [ 180.0, 555.0, 43.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 0
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "sel 1 0",
+													"fontsize" : 12.0,
+													"id" : "obj-10",
+													"patching_rect" : [ 180.0, 510.0, 46.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 3,
+													"outlettype" : [ "bang", "bang", "" ]
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "change",
+													"fontsize" : 12.0,
+													"id" : "obj-8",
+													"patching_rect" : [ 180.0, 480.0, 50.0, 20.0 ],
+													"numinlets" : 1,
+													"fontname" : "Arial",
+													"numoutlets" : 3,
+													"outlettype" : [ "", "int", "int" ]
+												}
+
+											}
+, 											{
+												"box" : 												{
+													"maxclass" : "newobj",
+													"text" : "> 1",
+													"fontsize" : 12.0,
+													"id" : "obj-1",
+													"patching_rect" : [ 180.0, 450.0, 32.5, 20.0 ],
+													"numinlets" : 2,
+													"fontname" : "Arial",
+													"numoutlets" : 1,
+													"outlettype" : [ "int" ]
+												}
+
+											}
+, 											{
+												"box" : 												{
 													"maxclass" : "comment",
 													"text" : "<-- ramp scaled to float, send alpha value to change RGBA of sensor zone ",
 													"linecount" : 2,
@@ -20876,6 +21058,51 @@
  ],
 										"lines" : [ 											{
 												"patchline" : 												{
+													"source" : [ "obj-10", 1 ],
+													"destination" : [ "obj-13", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-10", 0 ],
+													"destination" : [ "obj-12", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-93", 0 ],
+													"destination" : [ "obj-1", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-1", 0 ],
+													"destination" : [ "obj-8", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
+													"source" : [ "obj-8", 0 ],
+													"destination" : [ "obj-10", 0 ],
+													"hidden" : 0,
+													"midpoints" : [  ]
+												}
+
+											}
+, 											{
+												"patchline" : 												{
 													"source" : [ "obj-120", 0 ],
 													"destination" : [ "obj-121", 0 ],
 													"hidden" : 0,
@@ -21133,7 +21360,6 @@
 										"enablehscroll" : 1,
 										"enablevscroll" : 1,
 										"devicewidth" : 0.0,
-										"visible" : 1,
 										"boxes" : [ 											{
 												"box" : 												{
 													"maxclass" : "newobj",
