@@ -50,6 +50,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 1000;
+int lowThresh = 20;
+int highThresh = 100;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -207,7 +209,7 @@ void loop () {
          
          
 /*
-        if(displacement[i][j] > 1 && displacement[i][j] < 50){
+        if(displacement[i][j] > lowThresh && displacement[i][j] < highThresh){
           Serial.print(i);
           Serial.print(" ");
           Serial.print(j);
@@ -286,8 +288,9 @@ void autoCalibrate(){
 
   for (int i = 0; i < numMultiplexers; i++){
     for(int j = 0; j < numChannels; j++){
-      if(displacement[i][j] > 0){
+      if(displacement[i][j] > lowThresh){
         if(bIsZero[i][j] == true){ // did the sensor change from 0 to non-zero value?
+//          Serial.println("TRIGGER START GOOOOOOOOOO");
           timeSensorTriggered[i][j] = millis(); // start the timer
           bSensorTriggered[i][j] = true;
         }
@@ -296,8 +299,11 @@ void autoCalibrate(){
         }
       }
 
-      else if(displacement[i][j] == 0){
-        if(bIsZero[i][j] == false) bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+      else if(displacement[i][j] < lowThresh/2){
+        if(bIsZero[i][j] == false){
+          bIsZero[i][j] = true; // set back to true so it'll trigger again next time displacement is nonzero
+//          Serial.println("returned to zero naturally"); 
+        } 
       }
     }
   }
@@ -307,6 +313,7 @@ void autoCalibrate(){
 
       if(bSensorTriggered[i][j] == true){
         if(millis() - timeSensorTriggered[i][j] > recalibTime){
+//          Serial.println("TIMEOUT");
           sensorMax[i][j] = smoothAvg[i][j] + (sensorDiffRange[i][j] / 2);
           sensorMin[i][j] = smoothAvg[i][j] - (sensorDiffRange[i][j] / 2);
           bIsZero[i][j] = true;
@@ -316,7 +323,6 @@ void autoCalibrate(){
     }
   }
 }
-
 
 
 
