@@ -47,8 +47,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 1000;
-int lowThresh = 20;
-int highThresh = 70;
+int lowThresh = 15;
+int highThresh = 150;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -154,7 +154,7 @@ void loop()
 
         smoothAvg[i][j] = smoothTotal[i][j] / smoothSampleSize;
 
-        if(smoothAvg[i][j] > 0) nonZeroDivisor[i]++;
+        if(smoothAvg[i][j] > 5) nonZeroDivisor[i]++;
 
       }
     }
@@ -198,7 +198,7 @@ void loop()
       Serial.write(payload[i]);
       delay(10);
     }
-    autoCalibrate();
+//    autoCalibrate();
 
   }
 

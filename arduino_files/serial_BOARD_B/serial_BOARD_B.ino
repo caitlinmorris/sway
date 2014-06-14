@@ -10,7 +10,7 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 7
 #define numChannels 8
-#define amountOfVariance 10 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 8 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define recalibTime 1000 // time after which the sensor will recalibrate, currently 3 seconds
 
 int analogIn = 0; // stores analog value
@@ -46,9 +46,9 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 // displacementSum is the value that gets sent via XBee
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
-int sumTotal = 900; // slightly kludgy, matches up with max patch threshold of 10=active
-int lowThresh = 20;
-int highThresh = 70;
+int sumTotal = 1000; // slightly kludgy, matches up with max patch threshold of 10=active
+int lowThresh = 14;
+int highThresh = 140;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -157,15 +157,15 @@ void loop()
 
 
         if(i != 1){
-          if(smoothAvg[i][j] > 0)  nonZeroDivisor[i]++;
+          if(smoothAvg[i][j] > 5)  nonZeroDivisor[i]++;
         }
 
         else if( i == 1) {
           if(j == 0 || j==2 || j==6 || j==7){ //gross, but these are staying in zone m_1 now
-            if(smoothAvg[i][j] > 0) nonZeroDivisor[1]++;
+            if(smoothAvg[i][j] > 5) nonZeroDivisor[1]++;
           }
           else if(j == 1 || j==3 | j==4 || j==5) { //put these into pseudo-zone-m0
-            if(smoothAvg[i][j] > 0) nonZeroDivisor[0]++; // put these in what should be zone 0
+            if(smoothAvg[i][j] > 5) nonZeroDivisor[0]++; // put these in what should be zone 0
           }
         }
 
@@ -232,7 +232,7 @@ void loop()
       Serial.write(payload[i]);
       delay(10);
     }
-    autoCalibrate();
+//    autoCalibrate();
 
   }
 
