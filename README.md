@@ -8,14 +8,18 @@ sound by davide cairo + francesco novara
 concept
 ----
 
+
 Sway is a space where sound and physical form meet. The environment reflects the palpable experience of listening to music, in which many small parts work together to create a larger whole. When visitors become immersed in the mass of translucent reeds that form the geometry of the room, the sound composition reacts at the location of disturbance: individual sonic textures are revealed and distorted, unifying the experience of physical and aural textural breakdown. 
+
+general workflow
+----
+
+
+140+ flex sensors are grouped by 19 multiplexers into three Arduinos.  Each Arduino sends an array of sensor data (via Serial or XBee) to Processing.  In Processing, these arrays are combined into a single array which is transmitted over OSC to MaxMSP.  MaxMSP converts the data to MIDI and sends the MIDI stream to Ableton.
 
 assorted documentation
 ----
 
-**Workflow**
-
-Each of 3 arduinos sends an array of sensor data (via Serial or XBee) to Processing.  In Processing, these arrays are combined into a single array which is transmitted over OSC to MaxMSP.  MaxMSP converts the data to MIDI and sends the MIDI stream to Ableton.
 
 **Arduino Code Organization**
 
