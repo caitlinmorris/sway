@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6766E854-4587-493F-A26A-E00D6EBA6687</string>
+	<key>IDESourceControlProjectName</key>
+	<string>imageSequence_keyBased</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>1302DF1A-5662-41BE-8EC3-8001864A64CC</key>
+		<string>https://github.com/caitlinmorris/sway.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>of_files/projectionTrimlines/imageSequence_keyBased/imageSequence_keyBased.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>1302DF1A-5662-41BE-8EC3-8001864A64CC</key>
+		<string>../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/caitlinmorris/sway.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>1302DF1A-5662-41BE-8EC3-8001864A64CC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>1302DF1A-5662-41BE-8EC3-8001864A64CC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>sway</string>
+		</dict>
+	</array>
+</dict>
+</plist>

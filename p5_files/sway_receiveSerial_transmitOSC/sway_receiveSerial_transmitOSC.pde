@@ -49,9 +49,9 @@ void setup() {
 
   /* start oscP5, listening for incoming messages at port 12000 */
   oscP5 = new OscP5(this, 12000);
-  remoteAddress = new NetAddress("10.45.34.21", 12000); // lisa
-  //  remoteAddress = new NetAddress("10.45.35.226", 12000); // davide
-  //remoteAddress = new NetAddress("127.0.0.1", 12000); // local
+//  remoteAddress = new NetAddress("10.45.34.21", 12000); // lisa
+    remoteAddress = new NetAddress("10.177.16.1", 12000); // davide
+//  remoteAddress = new NetAddress("127.0.0.1", 12000); // local
 
 
 

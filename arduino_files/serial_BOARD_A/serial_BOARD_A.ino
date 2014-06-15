@@ -47,8 +47,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 1000;
-int lowThresh = 15;
-int highThresh = 150;
+int lowThresh = 14;
+int highThresh = 140;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input

@@ -14,7 +14,7 @@ caitlin morris + lisa kori chung, may 2014
 
 #define numMultiplexers 6
 #define numChannels 8
-#define amountOfVariance 15 // how much the sensor ranges from "normal", adjust as necessary with testing
+#define amountOfVariance 8 // how much the sensor ranges from "normal", adjust as necessary with testing
 #define outgoingConstVal 15 // number that each sensor gets constrained to, before adding to sum
 #define recalibTime 1000 // time after which the sensor will recalibrate, currently 3 seconds
 
@@ -50,8 +50,8 @@ int displacementSum [numMultiplexers]; // this is the total difference for each 
 
 int nonZeroDivisor [numMultiplexers]; // add up the number of non zero values to divide by
 int sumTotal = 1000;
-int lowThresh = 20;
-int highThresh = 100;
+int lowThresh = 0;
+int highThresh = 140;
 
 const int multi_0[] = {
   13,12,11}; // array of the pins connected to the 4051 input
@@ -203,12 +203,12 @@ void loop () {
 
       else if (DEBUG_MODE == 0){
         
-        
+        /*
          Serial.print(smoothAvg[i][j]); // print smoothed values
          Serial.print(" ");
+         */
          
-         
-/*
+
         if(displacement[i][j] > lowThresh && displacement[i][j] < highThresh){
           Serial.print(i);
           Serial.print(" ");
@@ -217,7 +217,7 @@ void loop () {
           Serial.print(displacement[i][j]); // print unconstrained displacement values
           Serial.println(" ");
         }
-*/
+
       }
     }
     if( DEBUG_MODE == 1) payload[i] = displacementSum[i] & 0xff;
@@ -231,7 +231,7 @@ void loop () {
     }
   }
 
-  Serial.println(); // equivalent to xbee.send();
+//  Serial.println(); // equivalent to xbee.send();
 
   autoCalibrate();
 
